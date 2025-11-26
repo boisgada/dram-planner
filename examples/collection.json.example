@@ -1,0 +1,37 @@
+{
+  "bottles": [
+    {
+      "id": 1,
+      "name": "Example Bourbon",
+      "category": "bourbon",
+      "abv": 45.0,
+      "price_paid": 25.99,
+      "purchase_date": "2023-01-15",
+      "opened_date": "",
+      "notes": "First bottle in collection",
+      "tasted": false,
+      "tasting_date": null,
+      "rating": null,
+      "tasting_notes": ""
+    },
+    {
+      "id": 2,
+      "name": "Example Scotch",
+      "category": "scotch",
+      "abv": 43.0,
+      "price_paid": 65.00,
+      "purchase_date": "2023-02-20",
+      "opened_date": "",
+      "notes": "",
+      "tasted": false,
+      "tasting_date": null,
+      "rating": null,
+      "tasting_notes": ""
+    }
+  ],
+  "metadata": {
+    "total_bottles": 2,
+    "last_updated": ""
+  }
+}
+
