@@ -1,0 +1,8 @@
+# Spirits Tasting Schedule
+# 
+# This project uses only Python standard library - no external dependencies required!
+# 
+# For development/testing (optional):
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+
