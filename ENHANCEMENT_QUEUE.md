@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 10
+- **Total Items:** 11
 - **In Progress:** 0
 - **Completed:** 6
-- **Pending:** 4
+- **Pending:** 5
 
 ## Priority Levels
 
@@ -24,8 +24,9 @@ Based on dependencies and user value, the prioritized development sequence is:
 2. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
 3. **ENH-008: User Groups & Shared Tasting Schedules** (🟡 Medium) - Community features
 4. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-5. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-6. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+5. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+6. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+7. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
@@ -542,6 +543,72 @@ Add barcode scanning and automatic product lookup functionality to the web GUI, 
 - **Caching:** Consider caching lookup results to improve performance
 
 **Related Issues:** Leverages ENH-002 CLI barcode functionality
+
+---
+
+#### ENH-011: Advanced Tasting Customization Options
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 2-3 weeks
+**Dependencies:** ENH-001 (User Preferences), ENH-004 (Web Application)
+
+**Description:**
+Add granular customization options for tasting sessions to support diverse tasting preferences and group tastings, including the ability to sample multiple bottles per session and various other wine/whiskey tasting protocols.
+
+**Features:**
+- [ ] **Multi-Bottle Tastings:**
+  - [ ] Configure number of bottles per tasting session (1-N)
+  - [ ] Set tasting session duration limits
+  - [ ] Group tasting support with round-robin or judge protocols
+- [ ] **Tasting Order Customization:**
+  - [ ] Sort by category, ABV, age, region, or price
+  - [ ] Custom sequencing algorithms (educational progression, variety optimization)
+  - [ ] Blind vs. open tasting modes
+- [ ] **Advanced Scheduling Options:**
+  - [ ] Flexible tasting intervals (daily, weekly, bi-weekly, monthly, custom)
+  - [ ] Seasonal tasting adjustments (lighter spirits in summer)
+  - [ ] Holiday/weekend preferences
+- [ ] **Tasting Notes Customization:**
+  - [ ] Multiple rating scales (0-10, 1-5 stars, letter grades A-F)
+  - [ ] Spirit-specific tasting note templates (whiskey, wine, beer, cocktails)
+  - [ ] Custom fields for personal preferences
+  - [ ] Professional vs. casual note-taking modes
+- [ ] **Group Tasting Features:**
+  - [ ] Shared tasting sessions for multiple users
+  - [ ] Group scoring and consensus ratings
+  - [ ] Tasting event planning with RSVPs
+  - [ ] Comparative tasting setups
+- [ ] **Progress Tracking Options:**
+  - [ ] Track by bottle count, volume consumed, or category coverage
+  - [ ] Milestone celebrations and achievements
+  - [ ] Personal tasting goals and targets
+- [ ] **Reminder & Notification Settings:**
+  - [ ] Customizable reminder timing and frequency
+  - [ ] Email, SMS, or app notifications
+  - [ ] Weather-based tasting suggestions
+- [ ] **Advanced Filtering:**
+  - [ ] Exclude recently tasted categories for palate recovery
+  - [ ] Price range preferences
+  - [ ] Complexity level targeting (beginner to expert)
+
+**Acceptance Criteria:**
+- Users can configure multiple bottles per tasting session
+- Flexible scheduling intervals and preferences
+- Customizable rating scales and tasting note templates
+- Group tasting functionality for shared experiences
+- Advanced filtering and sorting options
+- Comprehensive reminder and notification system
+
+**Considerations:**
+- **User Experience:** Don't overwhelm users with too many options - provide sensible defaults
+- **Performance:** Complex algorithms should not slow down schedule generation
+- **Data Migration:** Existing user preferences should migrate smoothly
+- **Scalability:** Group features should scale from 2 to 20+ participants
+- **Privacy:** Group data should respect individual privacy preferences
+- **Mobile:** Ensure all customizations work well on mobile devices
+
+**Related Issues:** Builds on ENH-001 user preferences system
 
 ---
 
