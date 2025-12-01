@@ -77,6 +77,7 @@
 
 <script>
 let currentGroupId = null;
+let currentScheduleId = null;
 
 function loadGroups() {
     fetch('/api/groups')
@@ -279,19 +280,64 @@ function loadGroupSettings() {
 }
 
 function createGroupSchedule() {
-    const scheduleName = prompt('Enter schedule name:');
-    if (!scheduleName) return;
+    // Show a more comprehensive schedule creation form
+    showScheduleCreationForm();
+}
 
-    const startDate = prompt('Enter start date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    if (!startDate) return;
+function showScheduleCreationForm() {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;';
+    modal.innerHTML = `
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <h3>Create Group Schedule</h3>
+            <form id="schedule-creation-form" onsubmit="submitGroupSchedule(event)">
+                <div class="form-group">
+                    <label>Schedule Name *</label>
+                    <input type="text" name="name" required placeholder="e.g., Holiday Tasting 2025">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" placeholder="Optional description..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Start Date *</label>
+                    <input type="date" name="start_date" required value="${new Date().toISOString().split('T')[0]}">
+                </div>
+                <div class="form-group">
+                    <label>Duration (weeks) *</label>
+                    <input type="number" name="weeks" required min="1" max="104" value="52">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="use_catalog" id="use-catalog" checked>
+                        Include bottles from master catalog
+                    </label>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="button" onclick="closeScheduleCreationModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Create Schedule</button>
+                </div>
+            </form>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
 
-    const weeks = parseInt(prompt('Enter duration in weeks:', '52'));
-    if (!weeks || weeks < 1) return;
+function closeScheduleCreationModal() {
+    const modal = document.querySelector('div[style*="position: fixed"]');
+    if (modal) modal.remove();
+}
 
+function submitGroupSchedule(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
     const data = {
-        name: scheduleName,
-        start_date: startDate,
-        weeks: weeks
+        name: formData.get('name'),
+        description: formData.get('description'),
+        start_date: formData.get('start_date'),
+        weeks: parseInt(formData.get('weeks')),
+        use_catalog: formData.has('use_catalog')
     };
 
     fetch(`/api/groups/${currentGroupId}/schedules`, {
@@ -301,6 +347,7 @@ function createGroupSchedule() {
     })
     .then(response => response.json())
     .then(schedule => {
+        closeScheduleCreationModal();
         loadGroupSchedules();
         alert(`Schedule "${schedule.name}" created successfully!`);
     })
@@ -311,8 +358,102 @@ function createGroupSchedule() {
 }
 
 function viewGroupSchedule(scheduleId) {
-    // TODO: Implement schedule viewing
-    alert('Schedule viewing coming soon!');
+    currentScheduleId = scheduleId;
+
+    // Show schedule details in a modal
+    fetch(`/api/groups/${currentGroupId}/schedules/${scheduleId}`)
+        .then(response => response.json())
+        .then(schedule => {
+            // Get schedule items
+            return fetch(`/api/groups/${currentGroupId}/schedules/${scheduleId}/items`)
+                .then(response => response.json())
+                .then(itemsData => {
+                    showScheduleDetailsModal(schedule, itemsData.items);
+                });
+        })
+        .catch(error => {
+            console.error('Error loading schedule:', error);
+            alert('Error loading schedule details');
+        });
+}
+
+function showScheduleDetailsModal(schedule, items) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;';
+    modal.innerHTML = `
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 900px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3>${schedule.name}</h3>
+                    ${schedule.description ? `<p>${schedule.description}</p>` : ''}
+                    <p><strong>Duration:</strong> ${schedule.weeks} weeks starting ${new Date(schedule.start_date).toLocaleDateString()}</p>
+                </div>
+                <button onclick="closeScheduleDetailsModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">×</button>
+            </div>
+
+            <div class="schedule-items">
+                ${generateScheduleItemsHTML(items)}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function generateScheduleItemsHTML(items) {
+    if (!items || items.length === 0) {
+        return '<p>No schedule items found.</p>';
+    }
+
+    let html = '<table class="schedule-table"><thead><tr><th>Week</th><th>Date</th><th>Bottle</th><th>Category</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+
+    items.forEach(item => {
+        const status = item.completed ? '✅ Completed' : '⏳ Pending';
+        const statusClass = item.completed ? 'completed' : 'pending';
+
+        html += `
+            <tr class="${statusClass}">
+                <td>${item.week}</td>
+                <td>${new Date(item.tasting_date).toLocaleDateString()}</td>
+                <td>${item.bottle_name}</td>
+                <td><span class="category-badge">${item.category}</span></td>
+                <td>${status}</td>
+                <td>
+                    ${!item.completed ?
+                        `<button onclick="markItemComplete(${item.id})" class="btn btn-sm btn-success">Mark Complete</button>` :
+                        `Completed by ${item.completed_by}`
+                    }
+                </td>
+            </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    return html;
+}
+
+function closeScheduleDetailsModal() {
+    const modal = document.querySelector('div[style*="position: fixed"]');
+    if (modal) modal.remove();
+}
+
+function markItemComplete(itemId) {
+    fetch(`/api/groups/${currentGroupId}/schedules/${currentScheduleId}/items/${itemId}/complete`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.error) {
+            alert('Error: ' + result.error);
+        } else {
+            // Refresh the schedule view - reload the modal content
+            closeScheduleDetailsModal();
+            viewGroupSchedule(currentScheduleId);
+        }
+    })
+    .catch(error => {
+        console.error('Error marking item complete:', error);
+        alert('Error updating item');
+    });
 }
 
 // Load groups on page load
@@ -451,6 +592,45 @@ loadGroups();
 
 .tab-content {
     min-height: 200px;
+}
+
+.schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.schedule-table th, .schedule-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.schedule-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.schedule-table tr.completed {
+    background-color: #d4edda;
+}
+
+.schedule-table tr.pending {
+    background-color: #fff3cd;
+}
+
+.category-badge {
+    background: #007bff;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
 }
 </style>
 {% endblock %}

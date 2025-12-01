@@ -4,7 +4,7 @@ Groups API endpoints for Dram Planner Web
 
 from flask import request, jsonify
 from app.api import bp
-from app.models import UserGroup, GroupMembership, GroupSchedule, GroupScheduleItem, User, db
+from app.models import UserGroup, GroupMembership, GroupSchedule, GroupScheduleItem, User, Bottle, MasterBeverage, db
 from flask_login import login_required, current_user
 from datetime import datetime
 import sys
@@ -310,36 +310,105 @@ def create_group_schedule(group_id):
     db.session.add(schedule)
     db.session.commit()
 
-    # Generate schedule items based on group members' collections
-    _generate_group_schedule_items(schedule, data.get('bottles', []))
+    # Generate schedule items based on group members and catalog
+    _generate_group_schedule_items(schedule, data)
 
     return jsonify(schedule.to_dict()), 201
 
 
-def _generate_group_schedule_items(schedule, bottle_list=None):
+def _generate_group_schedule_items(schedule, options=None):
     """Generate schedule items for a group schedule."""
-    # This is a simplified version - in practice, you'd want to
-    # aggregate bottles from all group members and create a collaborative schedule
 
-    if not bottle_list:
-        # For now, create placeholder items
-        # TODO: Implement proper group bottle aggregation
-        bottle_list = [
-            {'name': 'Group Selection 1', 'category': 'whiskey'},
-            {'name': 'Group Selection 2', 'category': 'scotch'},
-            {'name': 'Group Selection 3', 'category': 'bourbon'},
+    if options is None:
+        options = {}
+
+    # Get group members
+    memberships = GroupMembership.query.filter_by(group_id=schedule.group_id).all()
+    member_ids = [m.user_id for m in memberships]
+
+    # Collect available bottles
+    available_bottles = []
+
+    # Add bottles from group members' collections
+    for member_id in member_ids:
+        member_bottles = Bottle.query.filter_by(user_id=member_id).all()
+        for bottle in member_bottles:
+            available_bottles.append({
+                'name': bottle.name,
+                'category': bottle.category or 'other',
+                'source': 'member',
+                'owner_id': member_id,
+                'owner_name': bottle.user.username
+            })
+
+    # Optionally add bottles from master catalog
+    if options.get('use_catalog', False):
+        catalog_bottles = MasterBeverage.query.limit(100).all()  # Limit to prevent overwhelming
+        for bottle in catalog_bottles:
+            available_bottles.append({
+                'name': bottle.name,
+                'category': bottle.category,
+                'source': 'catalog',
+                'brand': bottle.brand
+            })
+
+    # If no bottles available, create placeholder
+    if not available_bottles:
+        available_bottles = [
+            {'name': 'Sample Bourbon', 'category': 'bourbon', 'source': 'placeholder'},
+            {'name': 'Sample Scotch', 'category': 'scotch', 'source': 'placeholder'},
+            {'name': 'Sample Irish', 'category': 'irish', 'source': 'placeholder'},
         ]
 
+    # Shuffle and distribute bottles across the schedule
+    import random
+    random.shuffle(available_bottles)
+
+    # Try to ensure category variety
+    category_counts = {}
+    scheduled_bottles = []
+
+    # First pass: try to balance categories
+    for bottle in available_bottles:
+        category = bottle['category']
+        if category_counts.get(category, 0) < (schedule.weeks // 4) + 1:  # Allow some category repetition
+            scheduled_bottles.append(bottle)
+            category_counts[category] = category_counts.get(category, 0) + 1
+
+            if len(scheduled_bottles) >= schedule.weeks:
+                break
+
+    # Fill remaining slots if needed
+    if len(scheduled_bottles) < schedule.weeks:
+        for bottle in available_bottles:
+            if bottle not in scheduled_bottles:
+                scheduled_bottles.append(bottle)
+                if len(scheduled_bottles) >= schedule.weeks:
+                    break
+
+    # Create schedule items
     current_date = schedule.start_date
     for week in range(1, schedule.weeks + 1):
-        bottle = bottle_list[(week - 1) % len(bottle_list)]
+        if week <= len(scheduled_bottles):
+            bottle = scheduled_bottles[week - 1]
+        else:
+            # Fallback to cycling through available bottles
+            bottle = available_bottles[(week - 1) % len(available_bottles)]
+
+        # Create descriptive bottle name
+        bottle_name = bottle['name']
+        if bottle.get('brand'):
+            bottle_name = f"{bottle['brand']} {bottle_name}"
+        if bottle.get('owner_name'):
+            bottle_name = f"{bottle_name} (from {bottle['owner_name']})"
 
         item = GroupScheduleItem(
             schedule_id=schedule.id,
             week=week,
             tasting_date=current_date,
-            bottle_name=bottle['name'],
-            category=bottle.get('category', 'other')
+            bottle_name=bottle_name,
+            category=bottle['category'],
+            notes=f"Source: {bottle['source']}"
         )
 
         db.session.add(item)
