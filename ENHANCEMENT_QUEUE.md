@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 3
+- **Total Items:** 4
 - **In Progress:** 0
 - **Completed:** 2
-- **Pending:** 1
+- **Pending:** 2
 
 ## Priority Levels
 
@@ -126,6 +126,49 @@ Enhance import capabilities to support multiple formats and external sources.
 - Validate imported data
 - Handle import errors gracefully
 - Clear import documentation
+
+**Related Issues:** None
+
+---
+
+#### ENH-004: Hosted Web Application
+**Status:** 🟡 Pending  
+**Added:** 2025-01-01  
+**Priority:** 🟡 Medium  
+**Effort:** 1-2 weeks  
+**Dependencies:** Web framework (Flask/FastAPI), database (SQLite/PostgreSQL), hosting platform
+
+**Description:**
+Convert Dram Planner from CLI tool to a hosted web application for easier access and multi-device support.
+
+**Features:**
+- [ ] Web framework setup (Flask or FastAPI)
+- [ ] RESTful API for all operations
+- [ ] Web UI for collection management
+- [ ] Web UI for schedule viewing and management
+- [ ] User authentication and accounts
+- [ ] Database migration from JSON to SQLite/PostgreSQL
+- [ ] Responsive design (mobile-friendly)
+- [ ] Hosting setup (Heroku, Railway, Render, or similar)
+- [ ] Data export/import functionality
+- [ ] Calendar integration (iCal export)
+- [ ] Photo uploads for bottles
+- [ ] Statistics and analytics dashboard
+
+**Acceptance Criteria:**
+- Users can access application via web browser
+- All CLI functionality available via web interface
+- User data securely stored and isolated
+- Responsive design works on mobile devices
+- Application deployed and accessible publicly
+- Data can be exported/imported
+
+**Considerations:**
+- Maintain backward compatibility with CLI tool
+- Consider keeping CLI as alternative interface
+- Evaluate hosting costs and options
+- Plan for user data privacy and security
+- Consider migration path for existing users
 
 **Related Issues:** None
 
