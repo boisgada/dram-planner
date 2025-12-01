@@ -141,12 +141,13 @@ Enhance import capabilities to support multiple formats and external sources.
 
 ---
 
-#### ENH-004: Hosted Web Application
-**Status:** 🔵 In Progress  
-**Added:** 2025-01-01  
-**Started:** 2025-01-01  
-**Priority:** 🟡 Medium  
-**Effort:** 1-2 weeks  
+#### ✅ ENH-004: Hosted Web Application
+**Status:** ✅ Completed
+**Added:** 2025-01-01
+**Started:** 2025-01-01
+**Completed:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 4-6 weeks
 **Dependencies:** Web framework (Flask/FastAPI), database (SQLite/PostgreSQL), hosting platform
 
 **Description:**
@@ -163,8 +164,9 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
 - [x] Data export/import functionality (CSV, JSON)
 - [x] Calendar integration (iCal export)
 - [x] Statistics and analytics dashboard
-- [ ] Photo uploads for bottles
-- [ ] Hosting setup (currently on vps05)
+- [x] Photo uploads for bottles
+- [x] Enhanced calendar view with visual widget
+- [x] Hosting setup (deployed on vps05)
 
 **Implementation Notes:**
 - Flask application structure created
@@ -186,6 +188,8 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
   - Export/import functionality (CSV, JSON, iCal)
   - Responsive mobile-friendly design
   - Enhanced dashboard with statistics
+  - Photo upload functionality with thumbnails
+  - Visual calendar widget for schedule viewing
 - **Deployed:** Running on vps05 with localhost-only binding
 
 **Acceptance Criteria:**

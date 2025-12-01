@@ -3,6 +3,72 @@
 {% block title %}Schedule - Dram Planner{% endblock %}
 
 {% block content %}
+<style>
+.calendar-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.calendar-table th, .calendar-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    vertical-align: top;
+    height: 100px;
+    min-width: 120px;
+}
+
+.calendar-table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+.calendar-cell {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-cell:hover {
+    background-color: #f8f9fa;
+}
+
+.calendar-cell.today {
+    background-color: #e3f2fd;
+    font-weight: bold;
+}
+
+.calendar-cell.other-month {
+    background-color: #f5f5f5;
+    color: #999;
+}
+
+.calendar-cell.has-tasting {
+    background-color: #fff3cd;
+}
+
+.calendar-date {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.calendar-tastings {
+    font-size: 11px;
+    color: #666;
+}
+
+.calendar-tasting {
+    background-color: #007bff;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin: 2px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
 <h1>Tasting Schedule</h1>
 
 <div class="card">
@@ -39,9 +105,28 @@
 <div class="card" id="schedule-details" style="display: none;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <h2 id="schedule-name"></h2>
-        <button class="btn" id="export-schedule-btn" onclick="exportCurrentSchedule()" style="display: none;">Export iCal</button>
+        <div>
+            <button class="btn" id="list-view-btn" onclick="showListView()">List View</button>
+            <button class="btn btn-primary" id="calendar-view-btn" onclick="showCalendarView()">Calendar View</button>
+            <button class="btn" id="export-schedule-btn" onclick="exportCurrentSchedule()" style="display: none;">Export iCal</button>
+        </div>
     </div>
-    <div id="schedule-items"></div>
+
+    <!-- List View -->
+    <div id="schedule-list-view">
+        <div id="schedule-items"></div>
+    </div>
+
+    <!-- Calendar View -->
+    <div id="schedule-calendar-view" style="display: none;">
+        <div class="calendar-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <button class="btn" onclick="previousMonth()">&larr; Previous</button>
+            <h3 id="calendar-month-year"></h3>
+            <button class="btn" onclick="nextMonth()">Next &rarr;</button>
+            <button class="btn" onclick="goToToday()">Today</button>
+        </div>
+        <div id="calendar-grid"></div>
+    </div>
 </div>
 
 <script>
@@ -123,8 +208,21 @@ function viewSchedule(scheduleId) {
         .then(schedule => {
             document.getElementById('schedule-name').textContent = schedule.name;
             document.getElementById('export-schedule-btn').style.display = 'block';
+
+            // Store schedule items for calendar view
+            currentScheduleItems = schedule.items.map(item => ({
+                ...item,
+                tasting_date: item.date,
+                bottle_name: item.bottle ? item.bottle.name : 'N/A',
+                category: item.bottle ? item.bottle.category : 'N/A',
+                notes: item.notes || ''
+            }));
+
+            // Set default view to list
+            showListView();
+
             const itemsDiv = document.getElementById('schedule-items');
-            
+
             let html = '<table><thead><tr><th>Week</th><th>Date</th><th>Bottle</th><th>Category</th><th>ABV</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
             schedule.items.forEach(item => {
                 const bottle = item.bottle;
@@ -188,6 +286,123 @@ function exportCurrentSchedule() {
     if (currentScheduleId) {
         exportSchedule(currentScheduleId);
     }
+}
+
+// Calendar state
+let currentCalendarDate = new Date();
+let currentScheduleItems = [];
+
+// Calendar functions
+function showCalendarView() {
+    document.getElementById('schedule-list-view').style.display = 'none';
+    document.getElementById('schedule-calendar-view').style.display = 'block';
+    document.getElementById('list-view-btn').classList.remove('btn-primary');
+    document.getElementById('calendar-view-btn').classList.add('btn-primary');
+    renderCalendar();
+}
+
+function showListView() {
+    document.getElementById('schedule-calendar-view').style.display = 'none';
+    document.getElementById('schedule-list-view').style.display = 'block';
+    document.getElementById('calendar-view-btn').classList.remove('btn-primary');
+    document.getElementById('list-view-btn').classList.add('btn-primary');
+}
+
+function previousMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+    renderCalendar();
+}
+
+function goToToday() {
+    currentCalendarDate = new Date();
+    renderCalendar();
+}
+
+function renderCalendar() {
+    const month = currentCalendarDate.getMonth();
+    const year = currentCalendarDate.getFullYear();
+
+    // Update month/year display
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+    document.getElementById('calendar-month-year').textContent = `${monthNames[month]} ${year}`;
+
+    // Get first day of month and last day
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDay.getDay()); // Start from Sunday
+
+    // Create calendar grid
+    let html = '<table class="calendar-table"><thead><tr>';
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayNames.forEach(day => {
+        html += `<th>${day}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+
+    let currentDate = new Date(startDate);
+
+    for (let week = 0; week < 6; week++) {
+        html += '<tr>';
+        for (let day = 0; day < 7; day++) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const isCurrentMonth = currentDate.getMonth() === month;
+            const isToday = dateStr === new Date().toISOString().split('T')[0];
+            const tastings = getTastingsForDate(dateStr);
+
+            let cellClass = 'calendar-cell';
+            if (!isCurrentMonth) cellClass += ' other-month';
+            if (isToday) cellClass += ' today';
+            if (tastings.length > 0) cellClass += ' has-tasting';
+
+            html += `<td class="${cellClass}" onclick="showDateDetails('${dateStr}')">`;
+            html += `<div class="calendar-date">${currentDate.getDate()}</div>`;
+
+            if (tastings.length > 0) {
+                html += '<div class="calendar-tastings">';
+                tastings.forEach(tasting => {
+                    html += `<div class="calendar-tasting">${tasting.bottle_name}</div>`;
+                });
+                html += '</div>';
+            }
+
+            html += '</td>';
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        html += '</tr>';
+
+        // Stop if we've gone past the end of the month
+        if (currentDate.getMonth() > month && week >= 3) break;
+    }
+
+    html += '</tbody></table>';
+    document.getElementById('calendar-grid').innerHTML = html;
+}
+
+function getTastingsForDate(dateStr) {
+    return currentScheduleItems.filter(item => item.tasting_date === dateStr);
+}
+
+function showDateDetails(dateStr) {
+    const tastings = getTastingsForDate(dateStr);
+    if (tastings.length === 0) {
+        alert(`No tastings scheduled for ${dateStr}`);
+        return;
+    }
+
+    let message = `Tastings for ${dateStr}:\n\n`;
+    tastings.forEach(tasting => {
+        message += `• ${tasting.bottle_name} (${tasting.category})\n`;
+        if (tasting.notes) message += `  Notes: ${tasting.notes}\n`;
+    });
+
+    alert(message);
 }
 
 // Load schedules on page load
