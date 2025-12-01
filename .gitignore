@@ -41,6 +41,12 @@ data/
 *.db
 *.sqlite
 
+# Web application specific
+web/instance/*.db
+web/uploads/
+web/exports/
+web/migrations/versions/*.pyc
+
 # Configuration (if contains sensitive data)
 config.local.json
 config.json
@@ -48,6 +54,7 @@ config.json
 # OS
 .DS_Store
 Thumbs.db
+._*  # macOS resource fork files
 
 # Testing
 .pytest_cache/
