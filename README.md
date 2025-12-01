@@ -340,6 +340,7 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## 📚 Documentation
 
 - [User Guide](README.md) - This file
+- [Quick Reference](QUICK_REFERENCE.md) - Quick command reference
 - [Contributing Guidelines](CONTRIBUTING.md) - How to contribute
 - [Changelog](CHANGELOG.md) - Version history
 - [Tasting Notes Template](tasting_notes_template.md) - Template for detailed notes
