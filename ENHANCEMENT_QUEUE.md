@@ -173,6 +173,12 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
 - Authentication system with registration and login
 - SQLite database (PostgreSQL ready via DATABASE_URL)
 - Application entry point and configuration system
+- **Docker containerization complete:**
+  - Production Dockerfile with Gunicorn
+  - Development Dockerfile with hot-reload
+  - docker-compose.yml for production (PostgreSQL)
+  - docker-compose.dev.yml for development (SQLite)
+  - Comprehensive Docker documentation
 - **Next:** Web UI templates and frontend
 
 **Acceptance Criteria:**
