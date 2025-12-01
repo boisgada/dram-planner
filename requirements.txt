@@ -1,6 +1,15 @@
 # Spirits Tasting Schedule
 # 
-# This project uses only Python standard library - no external dependencies required!
+# Core functionality uses only Python standard library - no external dependencies required!
+# 
+# Optional dependencies for advanced features:
+# 
+# Barcode scanning and lookup (ENH-002):
+# requests>=2.28.0          # For Open Food Facts API
+# pyzbar>=0.1.9            # For barcode scanning from images
+# pillow>=9.0.0            # For image processing (required by pyzbar)
+# 
+# Note: On macOS, you may also need: brew install zbar
 # 
 # For development/testing (optional):
 # pytest>=7.0.0

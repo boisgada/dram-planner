@@ -6,8 +6,8 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 - **Total Items:** 3
 - **In Progress:** 0
-- **Completed:** 1
-- **Pending:** 2
+- **Completed:** 2
+- **Pending:** 1
 
 ## Priority Levels
 
@@ -62,8 +62,9 @@ Add user-specific scheduling preferences to allow customization of tasting sched
 ---
 
 #### ENH-002: Barcode Scanning & Automatic Lookup
-**Status:** 🟡 Pending  
+**Status:** ✅ Completed  
 **Added:** 2024-12-19  
+**Completed:** 2025-01-01  
 **Priority:** 🟠 High  
 **Effort:** 2-3 days  
 **Dependencies:** Optional (pyzbar, requests, pillow)
@@ -72,19 +73,28 @@ Add user-specific scheduling preferences to allow customization of tasting sched
 Add barcode scanning capability to automatically retrieve bottle information.
 
 **Features:**
-- [ ] Barcode scanning support (UPC-A, EAN-13)
-- [ ] Manual UPC entry option
-- [ ] Open Food Facts API integration (free)
-- [ ] Automatic bottle information retrieval
-- [ ] Store barcode/UPC in bottle data
-- [ ] Fallback to manual entry if lookup fails
-- [ ] CLI command for barcode entry
+- [x] Barcode scanning support (UPC-A, EAN-13) - via pyzbar
+- [x] Manual UPC entry option
+- [x] Open Food Facts API integration (free)
+- [x] Automatic bottle information retrieval
+- [x] Store barcode/UPC in bottle data
+- [x] Fallback to manual entry if lookup fails
+- [x] CLI command for barcode entry (`add_bottle.py barcode`)
 
 **Acceptance Criteria:**
-- Users can scan or enter barcodes
-- Automatic lookup retrieves bottle information
-- Graceful fallback if lookup fails
-- Barcode stored in collection for future reference
+- [x] Users can scan or enter barcodes
+- [x] Automatic lookup retrieves bottle information
+- [x] Graceful fallback if lookup fails
+- [x] Barcode stored in collection for future reference
+
+**Implementation Notes:**
+- Created `barcode_lookup.py` module with Open Food Facts API integration
+- Updated `add_bottle.py` with `barcode` command
+- Added barcode field to bottle data structure
+- Supports manual UPC entry and image file scanning
+- Category mapping from Open Food Facts to spirits categories
+- ABV extraction from product data
+- Optional dependencies documented in requirements.txt
 
 **Related Issues:** None
 
@@ -129,9 +139,10 @@ Enhance import capabilities to support multiple formats and external sources.
 
 ### Current Focus
 ✅ **ENH-001: User Preferences** - Completed!
+✅ **ENH-002: Barcode Scanning** - Completed!
 
 ### Next Up
-Proceeding with **ENH-002: Barcode Scanning** for high user value.
+Proceeding with **ENH-003: Enhanced External Import Capabilities**.
 
 ## Adding New Enhancements
 
@@ -153,5 +164,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-01-01
+**Last Updated:** 2025-01-01 (ENH-002 completed)
 
