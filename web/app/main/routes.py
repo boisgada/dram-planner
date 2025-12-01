@@ -56,3 +56,10 @@ def groups():
     """User groups page."""
     return render_template('groups.html')
 
+
+@bp.route('/whisky-sources')
+@login_required
+def whisky_sources():
+    """Whisky database integration page."""
+    return render_template('whisky_sources.html')
+

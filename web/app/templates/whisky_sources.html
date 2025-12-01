@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Whisky Databases - Dram Planner{% endblock %}
+
+{% block content %}
+<h1>Whisky Database Integration</h1>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Search Whisky Databases</h2>
+        <button class="btn" onclick="showImportOptions()">Import Options</button>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-section" style="margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 1rem; align-items: end;">
+            <div class="form-group">
+                <label>Search Whiskies</label>
+                <input type="text" id="whisky-search-input" placeholder="e.g., Macallan, Glenfiddich, Lagavulin..." onkeypress="handleSearchKeyPress(event)">
+            </div>
+            <div class="form-group">
+                <label>Data Sources</label>
+                <select id="source-select" multiple size="4">
+                    <option value="all" selected>All Sources</option>
+                    <option value="sample">Sample Database (Demo)</option>
+                    <option value="whiskybase">Whiskybase</option>
+                    <option value="distiller">Distiller</option>
+                    <option value="masterofmalt">Master of Malt</option>
+                    <option value="openwhisky">Open Whisky</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="searchWhiskyDatabases()">Search</button>
+            </div>
+        </div>
+        <div style="margin-top: 0.5rem; font-size: 0.9em; color: #666;">
+            Search across multiple whisky databases to find detailed information and tasting notes
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div id="search-results" style="display: none;">
+        <h3>Search Results</h3>
+        <div id="results-summary" style="margin-bottom: 1rem;"></div>
+        <div id="whisky-results"></div>
+        <div id="results-pagination" style="margin-top: 2rem; text-align: center;"></div>
+    </div>
+
+    <!-- Import Options Modal -->
+    <div id="import-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <h3>Import Whisky Data</h3>
+            <div style="margin-bottom: 1rem;">
+                <p>You can import whisky data from external sources to expand your catalog:</p>
+                <ul>
+                    <li><strong>API Integration:</strong> Direct connection to whisky databases</li>
+                    <li><strong>Bulk Import:</strong> CSV/JSON files from whisky communities</li>
+                    <li><strong>Public Lists:</strong> Import curated whisky collections</li>
+                </ul>
+            </div>
+
+            <div class="import-options">
+                <h4>Available Options:</h4>
+                <div style="display: grid; gap: 1rem;">
+                    <div class="import-option">
+                        <h5>🔍 Live Search</h5>
+                        <p>Search across whisky databases in real-time (currently implemented)</p>
+                        <span class="status-badge status-active">Active</span>
+                    </div>
+                    <div class="import-option">
+                        <h5>📄 CSV Import</h5>
+                        <p>Import whisky data from CSV files</p>
+                        <span class="status-badge status-planned">Planned</span>
+                    </div>
+                    <div class="import-option">
+                        <h5>🌐 Public Lists</h5>
+                        <p>Access curated whisky collections and rankings</p>
+                        <span class="status-badge status-planned">Planned</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                <button type="button" class="btn" onclick="closeImportModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSearchResults = [];
+let currentPage = 0;
+const resultsPerPage = 20;
+
+function handleSearchKeyPress(event) {
+    if (event.key === 'Enter') {
+        searchWhiskyDatabases();
+    }
+}
+
+function searchWhiskyDatabases() {
+    const query = document.getElementById('whisky-search-input').value.trim();
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+
+    const sourceSelect = document.getElementById('source-select');
+    const selectedSources = Array.from(sourceSelect.selectedOptions).map(option => option.value);
+
+    const resultsDiv = document.getElementById('search-results');
+    const resultsContainer = document.getElementById('whisky-results');
+    const summaryDiv = document.getElementById('results-summary');
+
+    resultsDiv.style.display = 'block';
+    resultsContainer.innerHTML = '<p>Searching whisky databases...</p>';
+    summaryDiv.innerHTML = '';
+
+    const sources = selectedSources.includes('all') ? ['all'] : selectedSources;
+    const url = `/api/whisky/search?q=${encodeURIComponent(query)}&sources=${sources.join(',')}&limit=${resultsPerPage}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                resultsContainer.innerHTML = `<p>Error: ${data.error}</p>`;
+                return;
+            }
+
+            currentSearchResults = data.results || [];
+
+            // Show summary
+            const sourcesSearched = data.sources_searched || [];
+            const totalResults = data.total_results || 0;
+
+            summaryDiv.innerHTML = `
+                <div class="search-summary">
+                    <strong>Found ${totalResults} whiskies</strong> across ${sourcesSearched.length} database(s):
+                    ${sourcesSearched.join(', ')}
+                    ${totalResults > resultsPerPage ? `<br><em>Showing first ${Math.min(resultsPerPage, totalResults)} results</em>` : ''}
+                </div>
+            `;
+
+            displaySearchResults(currentSearchResults);
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            resultsContainer.innerHTML = '<p>Error searching whisky databases. Please try again.</p>';
+        });
+}
+
+function displaySearchResults(results) {
+    const resultsContainer = document.getElementById('whisky-results');
+
+    if (!results || results.length === 0) {
+        resultsContainer.innerHTML = '<p>No whiskies found matching your search.</p>';
+        return;
+    }
+
+    let html = '<div class="whisky-results-grid">';
+
+    results.forEach((whisky, index) => {
+        html += `
+            <div class="whisky-result-card">
+                <div class="whisky-header">
+                    <h4>${whisky.name}</h4>
+                    ${whisky.brand ? `<div class="whisky-brand">${whisky.brand}</div>` : ''}
+                    <div class="whisky-source source-${whisky.source}">${whisky.source}</div>
+                </div>
+
+                <div class="whisky-details">
+                    <div class="whisky-meta">
+                        ${whisky.category ? `<span class="category">${whisky.category}</span>` : ''}
+                        ${whisky.abv ? `<span class="abv">${whisky.abv}% ABV</span>` : ''}
+                    </div>
+
+                    ${whisky.region || whisky.country ?
+                        `<div class="whisky-origin">
+                            ${whisky.region ? whisky.region : ''}${whisky.region && whisky.country ? ', ' : ''}${whisky.country ? whisky.country : ''}
+                        </div>` : ''
+                    }
+
+                    ${whisky.description ?
+                        `<div class="whisky-description">${whisky.description.length > 150 ? whisky.description.substring(0, 150) + '...' : whisky.description}</div>` : ''
+                    }
+                </div>
+
+                <div class="whisky-actions">
+                    <button class="btn btn-sm" onclick="viewWhiskyDetails('${whisky.source}', '${whisky.external_id || index}')">Details</button>
+                    <button class="btn btn-primary btn-sm" onclick="importWhisky('${whisky.source}', '${whisky.external_id || index}', '${whisky.name.replace(/'/g, "\\'")}')">Import to Catalog</button>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    resultsContainer.innerHTML = html;
+}
+
+function viewWhiskyDetails(source, whiskyId) {
+    // For now, show a simple alert with placeholder
+    // In a full implementation, this would open a detailed modal
+    alert(`Whisky details view coming soon!\n\nSource: ${source}\nID: ${whiskyId}\n\nThis feature will show detailed tasting notes, ratings, and reviews from the whisky database.`);
+}
+
+function importWhisky(source, whiskyId, name) {
+    if (!confirm(`Import "${name}" to your master catalog?\n\nThis will add the whisky to your Dram Planner catalog for use in your collection.`)) {
+        return;
+    }
+
+    const data = {
+        source: source,
+        whisky_id: whiskyId
+    };
+
+    fetch('/api/whisky/import', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.error) {
+            alert(`Import failed: ${result.error}`);
+        } else {
+            alert(`✅ "${result.beverage.name}" has been imported to your catalog!`);
+        }
+    })
+    .catch(error => {
+        console.error('Import error:', error);
+        alert('Error importing whisky. Please try again.');
+    });
+}
+
+function showImportOptions() {
+    document.getElementById('import-modal').style.display = 'block';
+}
+
+function closeImportModal() {
+    document.getElementById('import-modal').style.display = 'none';
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default search to "all sources"
+    const sourceSelect = document.getElementById('source-select');
+    for (let option of sourceSelect.options) {
+        if (option.value === 'all') {
+            option.selected = true;
+        } else {
+            option.selected = false;
+        }
+    }
+});
+</script>
+
+<style>
+.whisky-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.whisky-result-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: white;
+    transition: box-shadow 0.2s;
+}
+
+.whisky-result-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.whisky-header {
+    margin-bottom: 1rem;
+}
+
+.whisky-header h4 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.whisky-brand {
+    color: #666;
+    font-style: italic;
+    margin-bottom: 0.5rem;
+}
+
+.whisky-source {
+    display: inline-block;
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.source-whiskybase { background: #007bff; color: white; }
+.source-distiller { background: #28a745; color: white; }
+.source-masterofmalt { background: #ffc107; color: black; }
+.source-openwhisky { background: #6f42c1; color: white; }
+
+.whisky-meta {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.category {
+    background: #007bff;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.abv {
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.whisky-origin {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.whisky-description {
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.whisky-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.search-summary {
+    background: #e3f2fd;
+    padding: 1rem;
+    border-radius: 4px;
+    border-left: 4px solid #2196f3;
+}
+
+.import-options {
+    margin-top: 1rem;
+}
+
+.import-option {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+}
+
+.import-option h5 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-active {
+    background: #28a745;
+    color: white;
+}
+
+.status-planned {
+    background: #ffc107;
+    color: black;
+}
+</style>
+{% endblock %}
