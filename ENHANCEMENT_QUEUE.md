@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 9
+- **Total Items:** 10
 - **In Progress:** 1
 - **Completed:** 3
-- **Pending:** 5
+- **Pending:** 6
 
 ## Priority Levels
 
@@ -476,6 +476,56 @@ Use artificial intelligence to create personalized tasting schedules based on us
 
 ---
 
+#### ENH-010: Web Barcode Scanning & Lookup
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 1-2 weeks
+**Dependencies:** ENH-004 (Web Application), existing CLI barcode functionality
+
+**Description:**
+Add barcode scanning and automatic product lookup functionality to the web GUI, leveraging the existing CLI barcode lookup implementation.
+
+**Features:**
+- [ ] **Barcode Lookup API:**
+  - [ ] Create `/api/barcode/lookup/<barcode>` endpoint
+  - [ ] Integrate existing `barcode_lookup.py` module
+  - [ ] Add `requests` dependency to web requirements
+  - [ ] Handle API errors gracefully
+- [ ] **Web UI Integration:**
+  - [ ] Add barcode input field to "Add Bottle" form
+  - [ ] Add "Lookup" button next to barcode field
+  - [ ] Auto-populate form fields when product found
+  - [ ] Show lookup results with confirmation
+- [ ] **Enhanced UX:**
+  - [ ] Camera scanning support (if possible in browser)
+  - [ ] Manual UPC entry option
+  - [ ] Clear indication when lookup succeeds/fails
+  - [ ] Option to override auto-populated fields
+- [ ] **Error Handling:**
+  - [ ] Network timeout handling
+  - [ ] API unavailable fallback
+  - [ ] Invalid barcode feedback
+  - [ ] Product not found messaging
+
+**Acceptance Criteria:**
+- Users can enter barcode manually in web UI
+- Lookup button calls Open Food Facts API
+- Form fields auto-populate with product data
+- Clear feedback for successful lookups and errors
+- Graceful fallback when API unavailable
+
+**Considerations:**
+- **Dependencies:** CLI barcode module already exists, just needs web integration
+- **API Reliability:** Open Food Facts API may be slow or unavailable
+- **Privacy:** No user data sent to external API (only barcode)
+- **Browser Support:** Camera scanning may not work on all devices
+- **Caching:** Consider caching lookup results to improve performance
+
+**Related Issues:** Leverages ENH-002 CLI barcode functionality
+
+---
+
 ### 🟢 Low Priority
 
 *None currently*
@@ -510,5 +560,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-12-01 (ENH-006, ENH-007, ENH-008, ENH-009 added)
+**Last Updated:** 2025-12-01 (ENH-006, ENH-007, ENH-008, ENH-009, ENH-010 added)
 
