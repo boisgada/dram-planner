@@ -5,8 +5,8 @@ This document tracks all planned enhancements, features, and improvements for Dr
 ## Queue Status
 
 - **Total Items:** 10
-- **In Progress:** 1
-- **Completed:** 3
+- **In Progress:** 0
+- **Completed:** 4
 - **Pending:** 6
 
 ## Priority Levels
@@ -564,5 +564,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-12-01 (ENH-006, ENH-007, ENH-008, ENH-009, ENH-010 added)
+**Last Updated:** 2025-12-01 (ENH-004 completed)
 
