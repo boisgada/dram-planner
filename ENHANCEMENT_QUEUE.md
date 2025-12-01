@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 6
-- **In Progress:** 0
+- **Total Items:** 9
+- **In Progress:** 1
 - **Completed:** 3
-- **Pending:** 3
+- **Pending:** 5
 
 ## Priority Levels
 
@@ -311,6 +311,171 @@ Provide users with a master list/catalog of beverages to select from when adding
 
 ---
 
+#### ENH-007: Review Visualization & Social Features
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 3-4 weeks
+**Dependencies:** ENH-004 (Web Application), ENH-006 (Master Database)
+
+**Description:**
+Add social features to view and compare tasting reviews from other users and visualize community preferences.
+
+**Features:**
+- [ ] **Review Visualization:**
+  - [ ] View community reviews for bottles in your collection
+  - [ ] Visualize rating distributions and trends
+  - [ ] Compare your ratings with community averages
+  - [ ] See most popular bottles by category and region
+- [ ] **Social Discovery:**
+  - [ ] Browse reviews by other users (anonymized)
+  - [ ] Follow other users or categories
+  - [ ] Discover new bottles through community recommendations
+  - [ ] Community-curated "best of" lists
+- [ ] **Review Analytics:**
+  - [ ] Charts showing rating trends over time
+  - [ ] Category preference analysis (what the community likes)
+  - [ ] Seasonal drinking patterns visualization
+  - [ ] Bottle age vs. rating correlation analysis
+- [ ] **Privacy Controls:**
+  - [ ] Choose review visibility (public, friends-only, private)
+  - [ ] Anonymized community statistics
+  - [ ] Opt-out of social features
+- [ ] **Community Features:**
+  - [ ] Like/upvote helpful reviews
+  - [ ] Comment on reviews (optional)
+  - [ ] Share reviews to social media
+  - [ ] Create public tasting notes
+
+**Acceptance Criteria:**
+- Users can view community reviews for bottles
+- Visual charts show rating distributions and trends
+- Users can compare their preferences with community
+- Privacy controls allow users to manage visibility
+- Social discovery helps find new bottles to try
+
+**Considerations:**
+- **Privacy:** All reviews should be anonymous by default
+- **Data Aggregation:** Community stats should never reveal individual user data
+- **Content Moderation:** Basic moderation for inappropriate content
+- **Performance:** Large review datasets need efficient querying
+- **User Experience:** Balance social features with core functionality
+
+**Related Issues:** Depends on ENH-004, ENH-006
+
+---
+
+#### ENH-008: User Groups & Shared Tasting Schedules
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 4-6 weeks
+**Dependencies:** ENH-004 (Web Application), Database for user relationships
+
+**Description:**
+Allow users to form groups and share/follow tasting schedules, creating community-driven tasting experiences.
+
+**Features:**
+- [ ] **Group Creation:**
+  - [ ] Create public or private tasting groups
+  - [ ] Define group themes (e.g., "Bourbon Enthusiasts", "Scotch Tour 2025")
+  - [ ] Set group membership rules (open, invite-only, moderated)
+  - [ ] Group descriptions and rules
+- [ ] **Shared Schedules:**
+  - [ ] Subscribe to group tasting schedules
+  - [ ] Group-curated bottle selections
+  - [ ] Collaborative schedule creation
+  - [ ] Group progress tracking
+- [ ] **Social Features:**
+  - [ ] Join multiple groups
+  - [ ] Follow other users' public schedules
+  - [ ] Group discussions and tastings
+  - [ ] Schedule sharing and forking
+- [ ] **Group Management:**
+  - [ ] Group administrators and moderators
+  - [ ] Membership management
+  - [ ] Group statistics and analytics
+  - [ ] Group events and deadlines
+- [ ] **Subscription Model:**
+  - [ ] Follow/pre-subscribe to group schedules
+  - [ ] Automatic schedule updates from groups
+  - [ ] Group notifications and reminders
+  - [ ] Personalized group recommendations
+
+**Acceptance Criteria:**
+- Users can create and join tasting groups
+- Groups can create and share tasting schedules
+- Users can subscribe to group schedules
+- Group progress and discussions work
+- Privacy and moderation controls exist
+
+**Considerations:**
+- **Scale:** How to handle large groups efficiently
+- **Moderation:** Tools for group administrators
+- **Discovery:** How users find relevant groups
+- **Engagement:** Features to keep groups active
+- **Legal:** Terms of service for user-generated content
+
+**Related Issues:** Depends on ENH-004
+
+---
+
+#### ENH-009: AI-Powered Schedule Planning
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 4-6 weeks
+**Dependencies:** ENH-004 (Web Application), ENH-006 (Master Database), AI/ML libraries
+
+**Description:**
+Use artificial intelligence to create personalized tasting schedules based on user preferences, tasting history, and community data.
+
+**Features:**
+- [ ] **Preference Learning:**
+  - [ ] Analyze user's tasting notes and ratings
+  - [ ] Learn flavor preferences from text analysis
+  - [ ] Identify preferred characteristics (sweet, smoky, peaty, etc.)
+  - [ ] Build user taste profile over time
+- [ ] **Smart Recommendations:**
+  - [ ] Suggest bottles based on past preferences
+  - [ ] Predict ratings for untried bottles
+  - [ ] Recommend next bottles to try
+  - [ ] Seasonal and occasion-based suggestions
+- [ ] **Schedule Optimization:**
+  - [ ] AI-optimized tasting order
+  - [ ] Balance variety with preference matching
+  - [ ] Avoid fatigue from similar-tasting bottles
+  - [ ] Optimize for palate development
+- [ ] **Community Integration:**
+  - [ ] Use community reviews for recommendations
+  - [ ] Compare preferences with similar users
+  - [ ] Trend analysis for emerging favorites
+  - [ ] Collaborative filtering for bottle suggestions
+- [ ] **Advanced Features:**
+  - [ ] Natural language tasting note analysis
+  - [ ] Mood and occasion-based recommendations
+  - [ ] Pairing suggestions (food, music, etc.)
+  - [ ] Learning from explicit feedback
+
+**Acceptance Criteria:**
+- AI learns from user's tasting history
+- Personalized recommendations improve over time
+- Schedule generation considers learned preferences
+- Users can provide feedback on recommendations
+- System adapts to user feedback
+
+**Considerations:**
+- **Privacy:** User data used only for personalization
+- **Accuracy:** Clear about AI limitations and suggestions
+- **Fallback:** Traditional scheduling always available
+- **Bias:** Avoid reinforcing existing preferences too strongly
+- **Performance:** AI processing shouldn't slow down UI
+- **Explainability:** Users understand why recommendations are made
+
+**Related Issues:** Depends on ENH-004, ENH-006, ENH-007
+
+---
+
 ### 🟢 Low Priority
 
 *None currently*
@@ -345,5 +510,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-12-01 (ENH-006 added)
+**Last Updated:** 2025-12-01 (ENH-006, ENH-007, ENH-008, ENH-009 added)
 

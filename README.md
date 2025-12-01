@@ -7,19 +7,35 @@ A comprehensive Python-based system for managing your spirits collection and cre
 
 ## ✨ Features
 
+- 🌐 **Web Application** - Full web interface with modern UI and mobile support
 - 📅 **Tasting Schedule Generation** - Automatically create customizable tasting schedules
 - ⚙️ **User Preferences** - Customize frequency, preferred days, avoid dates, category preferences, and seasonal adjustments
 - 📊 **Collection Management** - Track your entire spirits collection in one place
 - 📝 **Tasting Notes** - Record detailed notes and ratings for each tasting
-- 📈 **Progress Tracking** - Monitor your progress by category and overall
+- 📈 **Progress Tracking** - Monitor your progress by category and overall with statistics
 - 🎯 **Smart Scheduling** - Prioritizes untasted bottles and ensures category variety
 - 💻 **CLI Interface** - Powerful command-line tools for all operations
 - 📥 **Multiple Import Formats** - Import from CSV, JSON, or Excel files
 - 📷 **Barcode Scanning** - Automatic bottle lookup via barcode/UPC scanning
+- 📸 **Photo Storage** - Upload and store bottle photos
+- 📱 **Mobile Friendly** - Responsive design works on all devices
 - 🆓 **100% Free** - No subscriptions, no limitations, completely open-source
 
 ## 🚀 Quick Installation
 
+### For Web Application (Docker)
+```bash
+# Clone repository
+git clone https://github.com/boisgada/dram-planner.git
+cd dram-planner/web
+
+# Start web application
+docker compose up -d --build
+
+# Access at http://localhost:5000
+```
+
+### For Command Line (Python)
 1. **Clone or download** this repository
 2. **No installation required!** Just ensure you have Python 3.6+ installed
 3. **Start using immediately** - no dependencies, no setup needed
@@ -44,6 +60,21 @@ Install optional dependencies:
 pip install requests pyzbar pillow openpyxl
 # On macOS, you may also need: brew install zbar
 ```
+
+## 🎯 Getting Started
+
+### Choose Your Interface
+
+**Option 1: Web Application (Recommended)**
+- Full graphical interface
+- Mobile-friendly
+- Photo uploads and statistics
+- Modern user experience
+
+**Option 2: Command Line (Advanced)**
+- Full control over all features
+- Scriptable and automated
+- Perfect for power users
 
 ## Quick Start
 
@@ -329,21 +360,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔮 Future Enhancements
 
 Planned enhancements (see [ENHANCEMENT_QUEUE.md](ENHANCEMENT_QUEUE.md)):
-- 🌐 **Hosted Web Application** - Web interface for easier access
-- 📱 **Mobile Applications** - iPhone and Android apps
-- 📊 **Enhanced Analytics** - Statistical analysis and insights
-- 📅 **Calendar Export** - iCal format for calendar integration
-- 🖼️ **Photo Storage** - Upload and store bottle photos
+- 👥 **Social Features** - Community reviews, user groups, and social discovery
+- 🤖 **AI-Powered Recommendations** - Smart schedule planning based on preferences
+- 📊 **Advanced Analytics** - Deep insights into your tasting habits and preferences
+- 📱 **Mobile Applications** - Native iPhone and Android apps
+- 🎯 **Master Beverage Database** - Curated catalog of spirits with reviews
 
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📚 Documentation
 
 - [User Guide](README.md) - This file
+- [Web Application Guide](web/README.md) - Web interface documentation
 - [Quick Reference](QUICK_REFERENCE.md) - Quick command reference
 - [Contributing Guidelines](CONTRIBUTING.md) - How to contribute
 - [Changelog](CHANGELOG.md) - Version history
 - [Tasting Notes Template](tasting_notes_template.md) - Template for detailed notes
+- [Enhancement Queue](ENHANCEMENT_QUEUE.md) - Planned features and roadmap
 
 ## 🐛 Issues & Support
 

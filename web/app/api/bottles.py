@@ -2,12 +2,14 @@
 Bottles API endpoints
 """
 
-from flask import request, jsonify
+from flask import request, jsonify, current_app, send_from_directory
 from app.api import bp
 from app.models import Bottle
 from app import db
 from flask_login import login_required, current_user
 from datetime import datetime
+import os
+from werkzeug.utils import secure_filename
 
 
 @bp.route('/bottles', methods=['GET'])
@@ -168,4 +170,125 @@ def get_stats():
         'categories': categories,
         'average_rating': float(avg_rating) if avg_rating else None
     })
+
+
+def allowed_file(filename):
+    """Check if file extension is allowed."""
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
+
+
+@bp.route('/bottles/<int:id>/photo', methods=['POST'])
+@login_required
+def upload_bottle_photo(id):
+    """Upload a photo for a bottle."""
+    bottle = Bottle.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    
+    if 'photo' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+    
+    file = request.files['photo']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+    
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'Invalid file type. Allowed: PNG, JPG, JPEG, GIF'}), 400
+    
+    # Create uploads directory if it doesn't exist
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    if isinstance(upload_folder, str):
+        upload_folder = os.path.abspath(upload_folder)
+    else:
+        upload_folder = str(upload_folder)
+    
+    os.makedirs(upload_folder, exist_ok=True)
+    
+    # Create user-specific subdirectory
+    user_upload_dir = os.path.join(upload_folder, str(current_user.id))
+    os.makedirs(user_upload_dir, exist_ok=True)
+    
+    # Generate unique filename
+    filename = secure_filename(file.filename)
+    file_ext = filename.rsplit('.', 1)[1].lower()
+    unique_filename = f"bottle_{bottle.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.{file_ext}"
+    filepath = os.path.join(user_upload_dir, unique_filename)
+    
+    # Save file
+    file.save(filepath)
+    
+    # Delete old photo if exists
+    if bottle.photo_path:
+        old_path = os.path.join(upload_folder, bottle.photo_path)
+        if os.path.exists(old_path):
+            try:
+                os.remove(old_path)
+            except:
+                pass  # Ignore errors deleting old file
+    
+    # Update bottle with new photo path (relative to upload folder)
+    bottle.photo_path = os.path.join(str(current_user.id), unique_filename)
+    bottle.updated_at = datetime.utcnow()
+    db.session.commit()
+    
+    return jsonify({
+        'success': True,
+        'photo_path': bottle.photo_path,
+        'photo_url': f'/api/bottles/{bottle.id}/photo'
+    })
+
+
+@bp.route('/bottles/<int:id>/photo', methods=['GET'])
+@login_required
+def get_bottle_photo(id):
+    """Get bottle photo."""
+    bottle = Bottle.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    
+    if not bottle.photo_path:
+        return jsonify({'error': 'No photo for this bottle'}), 404
+    
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    if isinstance(upload_folder, str):
+        upload_folder = os.path.abspath(upload_folder)
+    else:
+        upload_folder = str(upload_folder)
+    
+    photo_path = os.path.join(upload_folder, bottle.photo_path)
+    
+    if not os.path.exists(photo_path):
+        return jsonify({'error': 'Photo file not found'}), 404
+    
+    directory = os.path.dirname(photo_path)
+    filename = os.path.basename(photo_path)
+    
+    return send_from_directory(directory, filename)
+
+
+@bp.route('/bottles/<int:id>/photo', methods=['DELETE'])
+@login_required
+def delete_bottle_photo(id):
+    """Delete bottle photo."""
+    bottle = Bottle.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+    
+    if not bottle.photo_path:
+        return jsonify({'error': 'No photo to delete'}), 404
+    
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    if isinstance(upload_folder, str):
+        upload_folder = os.path.abspath(upload_folder)
+    else:
+        upload_folder = str(upload_folder)
+    
+    photo_path = os.path.join(upload_folder, bottle.photo_path)
+    
+    if os.path.exists(photo_path):
+        try:
+            os.remove(photo_path)
+        except:
+            pass  # Ignore errors
+    
+    bottle.photo_path = None
+    bottle.updated_at = datetime.utcnow()
+    db.session.commit()
+    
+    return jsonify({'success': True})
 

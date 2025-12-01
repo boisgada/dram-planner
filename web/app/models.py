@@ -75,6 +75,7 @@ class Bottle(db.Model):
             'notes': self.notes,
             'barcode': self.barcode,
             'photo_path': self.photo_path,
+            'photo_url': f'/api/bottles/{self.id}/photo' if self.photo_path else None,
             'tasted': self.tasted,
             'tasting_date': self.tasting_date.isoformat() if self.tasting_date else None,
             'rating': self.rating,
