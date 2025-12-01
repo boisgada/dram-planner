@@ -187,3 +187,48 @@ class UserConfig(db.Model):
     def __repr__(self):
         return f'<UserConfig user_id={self.user_id}>'
 
+
+class MasterBeverage(db.Model):
+    """Master catalog of beverages for quick selection."""
+    __tablename__ = 'master_beverages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False, index=True)
+    brand = db.Column(db.String(255), index=True)
+    category = db.Column(db.String(50), nullable=False, index=True)
+    subcategory = db.Column(db.String(100))
+    abv = db.Column(db.Float)
+    region = db.Column(db.String(100))
+    country = db.Column(db.String(100))
+    description = db.Column(db.Text)
+    tasting_notes = db.Column(db.Text)
+    image_url = db.Column(db.String(500))
+    external_id = db.Column(db.String(100))  # For external API references
+    source = db.Column(db.String(50))  # 'internal', 'openfoodfacts', etc.
+    verified = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'brand': self.brand,
+            'category': self.category,
+            'subcategory': self.subcategory,
+            'abv': self.abv,
+            'region': self.region,
+            'country': self.country,
+            'description': self.description,
+            'tasting_notes': self.tasting_notes,
+            'image_url': self.image_url,
+            'external_id': self.external_id,
+            'source': self.source,
+            'verified': self.verified,
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<MasterBeverage {self.name}>'
+

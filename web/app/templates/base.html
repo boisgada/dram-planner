@@ -141,6 +141,7 @@
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
             <a href="{{ url_for('main.collection') }}">Collection</a>
+            <a href="{{ url_for('main.catalog') }}">Catalog</a>
             <a href="{{ url_for('main.schedule') }}">Schedule</a>
             <a href="{{ url_for('main.settings') }}">Settings</a>
             <a href="{{ url_for('auth.logout') }}" style="float: right;">Logout ({{ current_user.username }})</a>

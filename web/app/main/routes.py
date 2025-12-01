@@ -42,3 +42,10 @@ def settings():
     """Settings/preferences page."""
     return render_template('settings.html')
 
+
+@bp.route('/catalog')
+@login_required
+def catalog():
+    """Beverage catalog browsing page."""
+    return render_template('catalog.html')
+
