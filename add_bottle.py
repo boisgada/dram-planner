@@ -8,6 +8,7 @@ import json
 import argparse
 from datetime import datetime
 import barcode_lookup
+import import_manager
 
 
 def load_collection(filepath='collection.json'):
@@ -165,32 +166,16 @@ def add_bottle(name, category, abv=None, price_paid=None, purchase_date=None, no
         return None
 
 
-def add_bottles_from_csv(csv_file, filepath='collection.json'):
-    """Add multiple bottles from a CSV file.
-    
-    CSV format: name,category,abv,price_paid,purchase_date,notes
-    Header row is optional.
+def add_bottles_from_import(bottles_data, filepath='collection.json'):
+    """Add multiple bottles from imported data.
     
     Args:
-        csv_file (str): Path to CSV file.
+        bottles_data (list): List of normalized bottle dictionaries.
         filepath (str): Path to collection file.
         
     Returns:
         int: Number of bottles added, or None on error.
     """
-    import csv
-    
-    try:
-        with open(csv_file, 'r') as f:
-            # Just check if file is readable
-            pass
-    except FileNotFoundError:
-        print(f"Error: CSV file {csv_file} not found.")
-        return None
-    except PermissionError:
-        print(f"Error: Permission denied reading {csv_file}.")
-        return None
-    
     collection = load_collection(filepath)
     if collection is None:
         return None
@@ -201,56 +186,151 @@ def add_bottles_from_csv(csv_file, filepath='collection.json'):
         next_id = 1
     
     added = 0
-    with open(csv_file, 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
-            # Skip header row if it looks like a header
-            if row[0].lower() in ['name', 'bottle', 'spirit']:
-                continue
-            
-            if len(row) < 2:
-                continue
-            
-            name = row[0].strip()
-            category = row[1].strip().lower() if len(row) > 1 else 'other'
-            try:
-                abv = float(row[2]) if len(row) > 2 and row[2] else 0.0
-            except (ValueError, IndexError):
-                abv = 0.0
-            
-            try:
-                price = float(row[3]) if len(row) > 3 and row[3] else 0.0
-            except (ValueError, IndexError):
-                price = 0.0
-            purchase_date = row[4].strip() if len(row) > 4 and row[4] else ''
-            notes = row[5].strip() if len(row) > 5 and row[5] else ''
-            
-            bottle = {
-                'id': next_id,
-                'name': name,
-                'category': category,
-                'abv': abv,
-                'price_paid': price,
-                'purchase_date': purchase_date,
-                'opened_date': '',
-                'notes': notes,
-                'barcode': '',
-                'tasted': False,
-                'tasting_date': None,
-                'rating': None,
-                'tasting_notes': ''
-            }
-            
-            collection['bottles'].append(bottle)
-            next_id += 1
-            added += 1
+    for bottle_data in bottles_data:
+        bottle = {
+            'id': next_id,
+            'name': bottle_data['name'],
+            'category': bottle_data['category'],
+            'abv': bottle_data['abv'],
+            'price_paid': bottle_data['price_paid'],
+            'purchase_date': bottle_data['purchase_date'],
+            'opened_date': bottle_data['opened_date'],
+            'notes': bottle_data['notes'],
+            'barcode': bottle_data['barcode'],
+            'tasted': bottle_data['tasted'],
+            'tasting_date': bottle_data['tasting_date'],
+            'rating': bottle_data['rating'],
+            'tasting_notes': bottle_data['tasting_notes']
+        }
+        
+        collection['bottles'].append(bottle)
+        next_id += 1
+        added += 1
     
     if save_collection(collection, filepath):
-        print(f"✓ Added {added} bottles from {csv_file}")
+        print(f"✓ Added {added} bottles to collection")
         return added
     else:
         print("Error: Failed to save collection.")
         return None
+
+
+def add_bottles_from_csv(csv_file, filepath='collection.json', preview=False):
+    """Add multiple bottles from a CSV file (enhanced).
+    
+    Args:
+        csv_file (str): Path to CSV file.
+        filepath (str): Path to collection file.
+        preview (bool): If True, only preview without adding.
+        
+    Returns:
+        int: Number of bottles added, or None on error.
+    """
+    bottles, errors, warnings = import_manager.import_from_csv(csv_file, preview=preview)
+    
+    if preview:
+        import_manager.print_import_preview(bottles, errors, warnings)
+        return len(bottles) if not errors else None
+    
+    if errors:
+        print(f"\nErrors found in CSV file:")
+        for error in errors[:10]:
+            print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more errors")
+        response = input("\nContinue importing valid bottles? (yes/no): ")
+        if response.lower() not in ('yes', 'y'):
+            print("Import cancelled.")
+            return None
+    
+    if warnings:
+        for warning in warnings:
+            print(f"Warning: {warning}")
+    
+    if not bottles:
+        print("No valid bottles to import.")
+        return None
+    
+    return add_bottles_from_import(bottles, filepath)
+
+
+def add_bottles_from_json(json_file, filepath='collection.json', preview=False):
+    """Add multiple bottles from a JSON file.
+    
+    Args:
+        json_file (str): Path to JSON file.
+        filepath (str): Path to collection file.
+        preview (bool): If True, only preview without adding.
+        
+    Returns:
+        int: Number of bottles added, or None on error.
+    """
+    bottles, errors, warnings = import_manager.import_from_json(json_file, preview=preview)
+    
+    if preview:
+        import_manager.print_import_preview(bottles, errors, warnings)
+        return len(bottles) if not errors else None
+    
+    if errors:
+        print(f"\nErrors found in JSON file:")
+        for error in errors[:10]:
+            print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more errors")
+        response = input("\nContinue importing valid bottles? (yes/no): ")
+        if response.lower() not in ('yes', 'y'):
+            print("Import cancelled.")
+            return None
+    
+    if warnings:
+        for warning in warnings:
+            print(f"Warning: {warning}")
+    
+    if not bottles:
+        print("No valid bottles to import.")
+        return None
+    
+    return add_bottles_from_import(bottles, filepath)
+
+
+def add_bottles_from_excel(excel_file, sheet_name=None, filepath='collection.json', preview=False):
+    """Add multiple bottles from an Excel file.
+    
+    Args:
+        excel_file (str): Path to Excel file (.xlsx).
+        sheet_name (str, optional): Sheet name. Uses first sheet if not specified.
+        filepath (str): Path to collection file.
+        preview (bool): If True, only preview without adding.
+        
+    Returns:
+        int: Number of bottles added, or None on error.
+    """
+    bottles, errors, warnings = import_manager.import_from_excel(excel_file, sheet_name, preview=preview)
+    
+    if preview:
+        import_manager.print_import_preview(bottles, errors, warnings)
+        return len(bottles) if not errors else None
+    
+    if errors:
+        print(f"\nErrors found in Excel file:")
+        for error in errors[:10]:
+            print(f"  - {error}")
+        if len(errors) > 10:
+            print(f"  ... and {len(errors) - 10} more errors")
+        response = input("\nContinue importing valid bottles? (yes/no): ")
+        if response.lower() not in ('yes', 'y'):
+            print("Import cancelled.")
+            return None
+    
+    if warnings:
+        for warning in warnings:
+            print(f"Warning: {warning}")
+    
+    if not bottles:
+        print("No valid bottles to import.")
+        return None
+    
+    return add_bottles_from_import(bottles, filepath)
 
 
 def add_bottle_from_barcode(barcode, price_paid=None, purchase_date=None, notes=None, filepath='collection.json'):
@@ -328,9 +408,21 @@ def main():
     barcode_parser.add_argument('--purchase-date', help='Purchase date (YYYY-MM-DD)')
     barcode_parser.add_argument('--notes', help='Additional notes')
     
-    # Add from CSV
+    # Add from CSV (enhanced)
     csv_parser = subparsers.add_parser('csv', help='Add bottles from CSV file')
     csv_parser.add_argument('csv_file', help='Path to CSV file')
+    csv_parser.add_argument('--preview', action='store_true', help='Preview import without adding')
+    
+    # Add from JSON
+    json_parser = subparsers.add_parser('json', help='Add bottles from JSON file')
+    json_parser.add_argument('json_file', help='Path to JSON file')
+    json_parser.add_argument('--preview', action='store_true', help='Preview import without adding')
+    
+    # Add from Excel
+    excel_parser = subparsers.add_parser('excel', help='Add bottles from Excel file (.xlsx)')
+    excel_parser.add_argument('excel_file', help='Path to Excel file')
+    excel_parser.add_argument('--sheet', help='Sheet name (uses first sheet if not specified)')
+    excel_parser.add_argument('--preview', action='store_true', help='Preview import without adding')
     
     args = parser.parse_args()
     
@@ -340,7 +432,11 @@ def main():
     elif args.command == 'barcode':
         add_bottle_from_barcode(args.barcode, args.price, args.purchase_date, args.notes)
     elif args.command == 'csv':
-        add_bottles_from_csv(args.csv_file)
+        add_bottles_from_csv(args.csv_file, preview=args.preview)
+    elif args.command == 'json':
+        add_bottles_from_json(args.json_file, preview=args.preview)
+    elif args.command == 'excel':
+        add_bottles_from_excel(args.excel_file, args.sheet, preview=args.preview)
     else:
         parser.print_help()
 
