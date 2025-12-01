@@ -10,7 +10,8 @@ from datetime import datetime, timedelta
 from app.api import bp
 from app.models import MasterBeverage, db
 from flask_login import login_required
-from flask import current_app
+from flask import request, jsonify, current_app
+from werkzeug.exceptions import BadRequest
 import logging
 
 logger = logging.getLogger(__name__)
@@ -279,28 +280,40 @@ WHISKY_SOURCES = {
 def search_whisky_databases():
     """Search across all whisky databases"""
 
+    logger.info("Whisky search request received")
+
     query = request.args.get('q', '').strip()
     sources = request.args.get('sources', 'all').split(',')
     limit = int(request.args.get('limit', 20))
 
+    logger.info(f"Search parameters: query='{query}', sources={sources}, limit={limit}")
+
     if not query:
+        logger.warning("Search query is empty")
         return jsonify({'error': 'Search query required'}), 400
 
     results = []
     source_results = {}
 
     # Search each requested source
-    sources_to_search = WHISKY_SOURCES.keys() if 'all' in sources else sources
+    sources_to_search = ['sample'] if 'all' in sources else [s for s in sources if s in ['sample', 'whiskybase', 'distiller', 'masterofmalt']]
+    logger.info(f"Sources to search: {list(sources_to_search)}")
 
     for source_name in sources_to_search:
         if source_name in WHISKY_SOURCES:
             source = WHISKY_SOURCES[source_name]
             try:
+                logger.info(f"Searching source: {source_name}")
                 source_results[source_name] = source.search(query, limit // len(sources_to_search))
                 results.extend(source_results[source_name])
+                logger.info(f"Source {source_name} returned {len(source_results[source_name])} results")
             except Exception as e:
-                logger.error(f"Error searching {source_name}: {e}")
+                logger.error(f"Error searching {source_name}: {e}", exc_info=True)
                 source_results[source_name] = []
+        else:
+            logger.warning(f"Unknown source requested: {source_name}")
+
+    logger.info(f"Total results before sorting: {len(results)}")
 
     # Sort results by relevance (simple name matching for now)
     results.sort(key=lambda x: x['name'].lower().find(query.lower()), reverse=True)
@@ -308,13 +321,18 @@ def search_whisky_databases():
     # Limit total results
     results = results[:limit]
 
-    return jsonify({
+    logger.info(f"Final results: {len(results)} items")
+
+    response_data = {
         'query': query,
         'total_results': len(results),
         'sources_searched': list(sources_to_search),
         'source_results': source_results,
         'results': results
-    })
+    }
+
+    logger.info("Whisky search completed successfully")
+    return jsonify(response_data)
 
 
 @bp.route('/whisky/<source>/<whisky_id>', methods=['GET'])
