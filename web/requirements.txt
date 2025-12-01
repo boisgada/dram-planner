@@ -17,6 +17,7 @@ Werkzeug>=2.3.0  # For password hashing
 
 # Utilities
 python-dotenv>=1.0.0
+requests>=2.28.0
 
 # Production server
 gunicorn>=21.0.0

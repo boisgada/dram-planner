@@ -57,6 +57,14 @@
                 </select>
             </div>
             <div class="form-group">
+                <label>Barcode/UPC</label>
+                <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                    <input type="text" name="barcode" id="barcode-input" placeholder="Enter barcode or scan">
+                    <button type="button" class="btn" onclick="lookupBarcode()" id="lookup-btn">Lookup</button>
+                </div>
+                <div id="barcode-result" style="margin-top: 0.5rem; font-size: 0.9em;"></div>
+            </div>
+            <div class="form-group">
                 <label>ABV (%)</label>
                 <input type="number" name="abv" step="0.1" min="0" max="100">
             </div>
@@ -440,6 +448,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function lookupBarcode() {
+    const barcodeInput = document.getElementById('barcode-input');
+    const lookupBtn = document.getElementById('lookup-btn');
+    const resultDiv = document.getElementById('barcode-result');
+
+    const barcode = barcodeInput.value.trim();
+    if (!barcode) {
+        resultDiv.innerHTML = '<span style="color: #dc3545;">Please enter a barcode first.</span>';
+        return;
+    }
+
+    // Show loading state
+    lookupBtn.disabled = true;
+    lookupBtn.textContent = 'Looking up...';
+    resultDiv.innerHTML = '<span style="color: #007bff;">Searching for product...</span>';
+
+    fetch(`/api/barcode/lookup/${encodeURIComponent(barcode)}`)
+        .then(response => response.json())
+        .then(data => {
+            lookupBtn.disabled = false;
+            lookupBtn.textContent = 'Lookup';
+
+            if (data.error) {
+                resultDiv.innerHTML = `<span style="color: #dc3545;">${data.error}</span>`;
+                return;
+            }
+
+            if (data.success && data.product) {
+                const product = data.product;
+
+                // Auto-fill form fields
+                if (product.name && !document.querySelector('input[name="name"]').value) {
+                    document.querySelector('input[name="name"]').value = product.name;
+                }
+
+                if (product.category && product.category !== 'other') {
+                    document.querySelector('select[name="category"]').value = product.category;
+                }
+
+                if (product.abv && !document.querySelector('input[name="abv"]').value) {
+                    document.querySelector('input[name="abv"]').value = product.abv;
+                }
+
+                // Show success message with product info
+                let resultHtml = `<span style="color: #28a745;">✓ Product found!</span><br>`;
+                resultHtml += `<strong>${product.name}</strong>`;
+                if (product.brand) resultHtml += ` by ${product.brand}`;
+                if (product.abv) resultHtml += ` (${product.abv}% ABV)`;
+                if (product.category && product.category !== 'other') resultHtml += ` - ${product.category}`;
+
+                resultDiv.innerHTML = resultHtml;
+            }
+        })
+        .catch(error => {
+            lookupBtn.disabled = false;
+            lookupBtn.textContent = 'Lookup';
+            resultDiv.innerHTML = '<span style="color: #dc3545;">Error connecting to barcode service. Please try again.</span>';
+            console.error('Barcode lookup error:', error);
+        });
+}
 
 // Load bottles on page load
 loadBottles();
