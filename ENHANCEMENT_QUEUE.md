@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 15
+- **Total Items:** 16
 - **In Progress:** 0
 - **Completed:** 8
-- **Pending:** 7
+- **Pending:** 8
 
 ## Priority Levels
 
@@ -22,15 +22,16 @@ Based on dependencies and user value, the prioritized development sequence is:
 
 1. **ENH-013: Security & Vulnerability Assessment** (🔴 Critical) - BLOCKS PUBLIC LAUNCH
 2. **ENH-014: Production Deployment & Infrastructure** (🔴 Critical) - Public deployment
-3. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
-4. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
-5. **ENH-012: Whisky Database Integration & Public Lists** (✅ Completed) - Extends catalog with whisky data
-6. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
-7. **ENH-015: Catalog Management & Administration** (🟡 Medium) - Catalog administration
-8. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-9. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
-10. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-11. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+3. **ENH-016: Group Creation Troubleshooting & Bug Fixes** (🟠 High) - Fix ENH-008 issues
+4. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
+5. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
+6. **ENH-012: Whisky Database Integration & Public Lists** (✅ Completed) - Extends catalog with whisky data
+7. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
+8. **ENH-015: Catalog Management & Administration** (🟡 Medium) - Catalog administration
+9. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
+10. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+11. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+12. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
@@ -876,6 +877,66 @@ Add administrative functionality to manage and maintain the master beverage cata
 - **Audit Trail:** Track all catalog modifications
 
 **Related Issues:** Extends ENH-006 master catalog with administrative capabilities
+
+---
+
+#### ENH-016: Group Creation Troubleshooting & Bug Fixes
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟠 High
+**Effort:** 1-2 weeks
+**Dependencies:** ENH-008 (User Groups & Shared Tasting Schedules)
+
+**Description:**
+Debug and resolve issues with the group creation and management functionality. Ensure all group features work correctly and provide a smooth user experience for creating and managing tasting groups.
+
+**Features:**
+- [ ] **Bug Investigation:**
+  - [ ] Test group creation functionality thoroughly
+  - [ ] Identify and document all issues with group features
+  - [ ] Check database relationships and constraints
+  - [ ] Verify API endpoints are working correctly
+- [ ] **Frontend Issues:**
+  - [ ] Test group creation modal and form submission
+  - [ ] Verify group list display and navigation
+  - [ ] Check member management interface
+  - [ ] Test schedule creation within groups
+- [ ] **Backend Issues:**
+  - [ ] Validate database models and relationships
+  - [ ] Test API endpoints for groups, memberships, schedules
+  - [ ] Check error handling and validation
+  - [ ] Verify authentication and authorization
+- [ ] **User Experience Issues:**
+  - [ ] Test complete user flow for group creation
+  - [ ] Verify invitation and member management
+  - [ ] Check group schedule functionality
+  - [ ] Test collaborative features
+- [ ] **Performance & Security:**
+  - [ ] Check for SQL injection vulnerabilities
+  - [ ] Validate input sanitization
+  - [ ] Test for race conditions in group operations
+  - [ ] Ensure proper error messages and logging
+- [ ] **Integration Testing:**
+  - [ ] Test group features with existing user accounts
+  - [ ] Verify group data persists correctly
+  - [ ] Check integration with other features (catalog, schedules)
+  - [ ] Test edge cases and error scenarios
+
+**Acceptance Criteria:**
+- Group creation works reliably for all users
+- All group management features function correctly
+- No security vulnerabilities in group operations
+- Clear error messages for failed operations
+- Complete documentation of fixes applied
+
+**Considerations:**
+- **User Impact:** Issues may prevent users from using group features
+- **Data Integrity:** Ensure no data corruption from bugs
+- **Testing:** Comprehensive testing of all group workflows
+- **Documentation:** Document all fixes and workarounds
+- **Regression:** Prevent reintroduction of fixed bugs
+
+**Related Issues:** Fixes issues in ENH-008 User Groups implementation
 
 ---
 
