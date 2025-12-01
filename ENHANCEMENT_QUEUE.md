@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 11
+- **Total Items:** 12
 - **In Progress:** 0
 - **Completed:** 6
-- **Pending:** 5
+- **Pending:** 6
 
 ## Priority Levels
 
@@ -22,11 +22,12 @@ Based on dependencies and user value, the prioritized development sequence is:
 
 1. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
 2. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
-3. **ENH-008: User Groups & Shared Tasting Schedules** (🟡 Medium) - Community features
-4. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-5. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
-6. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-7. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+3. **ENH-012: Whisky Database Integration & Public Lists** (🟡 Medium) - Extends catalog with whisky data
+4. **ENH-008: User Groups & Shared Tasting Schedules** (🟡 Medium) - Community features
+5. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
+6. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+7. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+8. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
@@ -609,6 +610,67 @@ Add granular customization options for tasting sessions to support diverse tasti
 - **Mobile:** Ensure all customizations work well on mobile devices
 
 **Related Issues:** Builds on ENH-001 user preferences system
+
+---
+
+#### ENH-012: Whisky Database Integration & Public Lists
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 3-4 weeks
+**Dependencies:** ENH-006 (Master Beverage Catalog)
+
+**Description:**
+Integrate with publicly available whisky databases and lists, providing search and import capabilities for comprehensive whisky data from sources like Whiskybase, Distiller, Master of Malt, and other whisky community resources.
+
+**Features:**
+- [ ] **Whisky Database APIs:**
+  - [ ] Integrate with Whiskybase API for comprehensive whisky data
+  - [ ] Connect to Distiller database API
+  - [ ] Add Master of Malt API integration
+  - [ ] Support for additional whisky databases (e.g., Whisky Advocate, Jim Murray's ratings)
+- [ ] **Public Whisky Lists:**
+  - [ ] Import whisky rankings and lists (e.g., Whisky Bible top 1000)
+  - [ ] Support for whisky tasting competition results
+  - [ ] Import from whisky enthusiast community lists
+  - [ ] Curated whisky collections from experts and publications
+- [ ] **Search & Discovery:**
+  - [ ] Search across multiple whisky databases simultaneously
+  - [ ] Advanced filtering by distillery, region, age, style, ratings
+  - [ ] Cross-reference prices and availability
+  - [ ] Whisky tasting note aggregation from multiple sources
+- [ ] **Data Synchronization:**
+  - [ ] Scheduled updates from external databases
+  - [ ] Incremental import to avoid duplicates
+  - [ ] Data quality validation and deduplication
+  - [ ] User preference for data sources (trust levels, update frequency)
+- [ ] **Import & Export:**
+  - [ ] Bulk import whisky lists to master catalog
+  - [ ] Export personal whisky data to share with communities
+  - [ ] API endpoints for third-party integrations
+  - [ ] Whisky collection sharing and backup
+- [ ] **Community Integration:**
+  - [ ] Link to whisky tasting communities and forums
+  - [ ] Import user-curated whisky lists
+  - [ ] Whisky tasting event data integration
+  - [ ] Social whisky discovery features
+
+**Acceptance Criteria:**
+- Users can search and import from major whisky databases
+- Public whisky lists can be imported to personal catalog
+- Cross-database search functionality works
+- Data synchronization maintains catalog accuracy
+- Community whisky lists are accessible
+
+**Considerations:**
+- **API Limits:** Respect rate limits and terms of service for external APIs
+- **Data Quality:** Validate and clean imported data
+- **Privacy:** No user data shared with external services
+- **Cost:** Consider free vs. paid API tiers
+- **Maintenance:** APIs may change or become unavailable
+- **Legal:** Ensure compliance with database usage terms
+
+**Related Issues:** Extends ENH-006 master catalog with whisky-specific data sources
 
 ---
 
