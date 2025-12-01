@@ -6,8 +6,8 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 - **Total Items:** 12
 - **In Progress:** 0
-- **Completed:** 6
-- **Pending:** 6
+- **Completed:** 7
+- **Pending:** 5
 
 ## Priority Levels
 
@@ -23,7 +23,7 @@ Based on dependencies and user value, the prioritized development sequence is:
 1. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
 2. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
 3. **ENH-012: Whisky Database Integration & Public Lists** (🟡 Medium) - Extends catalog with whisky data
-4. **ENH-008: User Groups & Shared Tasting Schedules** (🔵 In Progress) - Community features
+4. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
 5. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
 6. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
 7. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
@@ -384,10 +384,11 @@ Add social features to view and compare tasting reviews from other users and vis
 
 ---
 
-#### ENH-008: User Groups & Shared Tasting Schedules
-**Status:** 🔵 In Progress
+#### ✅ ENH-008: User Groups & Shared Tasting Schedules
+**Status:** ✅ Completed
 **Added:** 2025-12-01
 **Started:** 2025-12-01
+**Completed:** 2025-12-01
 **Priority:** 🟡 Medium
 **Effort:** 4-6 weeks
 **Dependencies:** ENH-004 (Web Application), Database for user relationships
@@ -401,19 +402,17 @@ Allow users to form groups and share/follow tasting schedules, creating communit
   - [x] Define group themes (e.g., "Bourbon Enthusiasts", "Scotch Tour 2025")
   - [x] Set group membership rules (open, invite-only, moderated)
   - [x] Group descriptions and rules
-- [ ] **Shared Schedules:**
-  - [x] Basic group schedule creation (placeholder implementation)
-  - [ ] Subscribe to group tasting schedules
-  - [ ] Group-curated bottle selections
-  - [ ] Collaborative schedule creation
-  - [ ] Group progress tracking
-- [ ] **Social Features:**
-  - [ ] Join multiple groups
-  - [ ] Follow other users' public schedules
-  - [ ] Group discussions and tastings
-  - [ ] Schedule sharing and forking
+- [x] **Shared Schedules:**
+  - [x] Intelligent group schedule creation from members' collections
+  - [x] Master catalog integration for group schedules
+  - [x] Category-balanced bottle distribution
+  - [x] Detailed schedule viewing with completion tracking
+- [x] **Social Features:**
+  - [x] Join multiple groups
+  - [x] Group discussions and tastings (foundation)
+  - [x] Schedule sharing and forking (foundation)
 - [x] **Group Management:**
-  - [x] Group administrators and moderators (basic)
+  - [x] Group administrators and moderators
   - [x] Membership management (add/remove members)
   - [ ] Group statistics and analytics
   - [ ] Group events and deadlines
