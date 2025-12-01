@@ -11,6 +11,9 @@
 # 
 # Note: On macOS, you may also need: brew install zbar
 # 
+# Enhanced imports (ENH-003):
+# openpyxl>=3.0.0           # For Excel (.xlsx) import support
+# 
 # For development/testing (optional):
 # pytest>=7.0.0
 # pytest-cov>=4.0.0
