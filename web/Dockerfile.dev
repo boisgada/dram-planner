@@ -1,0 +1,25 @@
+# Development Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=app
+ENV FLASK_ENV=development
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application (will be mounted as volume in dev)
+COPY . .
+
+# Create directories
+RUN mkdir -p uploads exports instance
+
+EXPOSE 5000
+
+# Development server with auto-reload
+CMD ["flask", "run", "--host", "0.0.0.0", "--port", "5000", "--debug"]
+

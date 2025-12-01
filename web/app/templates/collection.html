@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block title %}Collection - Dram Planner{% endblock %}
+
+{% block content %}
+<h1>My Collection</h1>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Bottles</h2>
+        <button class="btn btn-primary" onclick="showAddBottleForm()">Add Bottle</button>
+    </div>
+
+    <div id="add-bottle-form" style="display: none; margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+        <h3>Add New Bottle</h3>
+        <form id="bottle-form" onsubmit="addBottle(event)">
+            <div class="form-group">
+                <label>Name *</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>Category *</label>
+                <select name="category" required>
+                    <option value="bourbon">Bourbon</option>
+                    <option value="scotch">Scotch</option>
+                    <option value="irish">Irish</option>
+                    <option value="gin">Gin</option>
+                    <option value="vodka">Vodka</option>
+                    <option value="rum">Rum</option>
+                    <option value="tequila">Tequila</option>
+                    <option value="liqueur">Liqueur</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ABV (%)</label>
+                <input type="number" name="abv" step="0.1" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label>Price Paid</label>
+                <input type="number" name="price_paid" step="0.01" min="0">
+            </div>
+            <div class="form-group">
+                <label>Purchase Date</label>
+                <input type="date" name="purchase_date">
+            </div>
+            <div class="form-group">
+                <label>Notes</label>
+                <textarea name="notes" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-success" id="submit-btn">Add Bottle</button>
+            <button type="button" class="btn" onclick="hideAddBottleForm()">Cancel</button>
+        </form>
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+        <input type="text" id="search" placeholder="Search bottles..." style="width: 300px; padding: 0.5rem;" onkeyup="loadBottles()">
+        <select id="category-filter" onchange="loadBottles()" style="margin-left: 1rem; padding: 0.5rem;">
+            <option value="">All Categories</option>
+            <option value="bourbon">Bourbon</option>
+            <option value="scotch">Scotch</option>
+            <option value="irish">Irish</option>
+            <option value="gin">Gin</option>
+            <option value="vodka">Vodka</option>
+            <option value="rum">Rum</option>
+            <option value="tequila">Tequila</option>
+            <option value="liqueur">Liqueur</option>
+            <option value="other">Other</option>
+        </select>
+        <select id="tasted-filter" onchange="loadBottles()" style="margin-left: 1rem; padding: 0.5rem;">
+            <option value="">All</option>
+            <option value="true">Tasted</option>
+            <option value="false">Untasted</option>
+        </select>
+    </div>
+
+    <div id="bottles-table">
+        <p>Loading bottles...</p>
+    </div>
+</div>
+
+<script>
+function showAddBottleForm() {
+    document.getElementById('add-bottle-form').style.display = 'block';
+}
+
+function hideAddBottleForm() {
+    document.getElementById('add-bottle-form').style.display = 'none';
+    document.getElementById('bottle-form').reset();
+    document.getElementById('bottle-form').querySelector('h3').textContent = 'Add New Bottle';
+    document.getElementById('submit-btn').textContent = 'Add Bottle';
+    editingBottleId = null;
+}
+
+function loadBottles() {
+    const search = document.getElementById('search').value;
+    const category = document.getElementById('category-filter').value;
+    const tasted = document.getElementById('tasted-filter').value;
+    
+    let url = '/api/bottles?';
+    if (search) url += `search=${encodeURIComponent(search)}&`;
+    if (category) url += `category=${encodeURIComponent(category)}&`;
+    if (tasted) url += `tasted=${tasted}&`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const table = document.getElementById('bottles-table');
+            if (data.bottles.length === 0) {
+                table.innerHTML = '<p>No bottles found.</p>';
+                return;
+            }
+            
+            let html = '<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Category</th><th>ABV</th><th>Tasted</th><th>Rating</th><th>Actions</th></tr></thead><tbody>';
+            data.bottles.forEach(bottle => {
+                html += `<tr>
+                    <td>${bottle.name}</td>
+                    <td>${bottle.category}</td>
+                    <td>${bottle.abv || 'N/A'}%</td>
+                    <td>${bottle.tasted ? '✓' : '✗'}</td>
+                    <td>${bottle.rating || 'N/A'}</td>
+                    <td>
+                        <button class="btn" onclick="viewBottle(${bottle.id})">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteBottle(${bottle.id})">Delete</button>
+                        ${!bottle.tasted ? `<button class="btn btn-success" onclick="recordTasting(${bottle.id})">Record Tasting</button>` : ''}
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table></div>';
+            table.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error loading bottles:', error);
+            document.getElementById('bottles-table').innerHTML = '<p>Error loading bottles.</p>';
+        });
+}
+
+function addBottle(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData);
+    
+    const url = editingBottleId ? `/api/bottles/${editingBottleId}` : '/api/bottles';
+    const method = editingBottleId ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        hideAddBottleForm();
+        loadBottles();
+        alert(editingBottleId ? 'Bottle updated successfully!' : 'Bottle added successfully!');
+        editingBottleId = null;
+    })
+    .catch(error => {
+        console.error('Error saving bottle:', error);
+        alert('Error saving bottle');
+    });
+}
+
+function recordTasting(bottleId) {
+    const rating = prompt('Enter rating (0-10):');
+    if (!rating) return;
+    
+    const notes = prompt('Enter tasting notes (optional):') || '';
+    const dateInput = prompt('Enter tasting date (YYYY-MM-DD) or leave blank for today:');
+    const date = dateInput || new Date().toISOString().split('T')[0];
+    
+    const ratingNum = parseFloat(rating);
+    if (isNaN(ratingNum) || ratingNum < 0 || ratingNum > 10) {
+        alert('Please enter a valid rating between 0 and 10');
+        return;
+    }
+    
+    fetch(`/api/bottles/${bottleId}/tasting`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            rating: ratingNum,
+            tasting_notes: notes,
+            tasting_date: date
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to record tasting');
+        }
+    })
+    .then(data => {
+        loadBottles();
+        alert('Tasting recorded successfully!');
+    })
+    .catch(error => {
+        console.error('Error recording tasting:', error);
+        alert('Error recording tasting. Please try again.');
+    });
+}
+
+let editingBottleId = null;
+
+function viewBottle(bottleId) {
+    fetch(`/api/bottles/${bottleId}`)
+        .then(response => response.json())
+        .then(bottle => {
+            // Show bottle details in a modal or form
+            editingBottleId = bottle.id;
+            document.getElementById('bottle-form').reset();
+            document.getElementById('bottle-form').querySelector('h3').textContent = 'Edit Bottle';
+            
+            // Populate form
+            document.querySelector('input[name="name"]').value = bottle.name || '';
+            document.querySelector('select[name="category"]').value = bottle.category || 'other';
+            document.querySelector('input[name="abv"]').value = bottle.abv || '';
+            document.querySelector('input[name="price_paid"]').value = bottle.price_paid || '';
+            document.querySelector('input[name="purchase_date"]').value = bottle.purchase_date || '';
+            document.querySelector('textarea[name="notes"]').value = bottle.notes || '';
+            
+            // Update button text
+            document.getElementById('submit-btn').textContent = 'Update Bottle';
+            
+            // Show form
+            document.getElementById('add-bottle-form').style.display = 'block';
+            document.getElementById('add-bottle-form').scrollIntoView({ behavior: 'smooth' });
+        })
+        .catch(error => {
+            console.error('Error loading bottle:', error);
+            alert('Error loading bottle details');
+        });
+}
+
+function deleteBottle(bottleId) {
+    if (confirm('Are you sure you want to delete this bottle? This action cannot be undone.')) {
+        fetch(`/api/bottles/${bottleId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                loadBottles();
+                alert('Bottle deleted successfully');
+            } else {
+                alert('Error deleting bottle');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting bottle:', error);
+            alert('Error deleting bottle');
+        });
+    }
+}
+
+// Load bottles on page load
+loadBottles();
+</script>
+{% endblock %}
+

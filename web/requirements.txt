@@ -1,0 +1,27 @@
+# Web Application Dependencies
+# Dram Planner Web Interface
+
+# Core Framework
+Flask>=2.3.0
+Flask-SQLAlchemy>=3.0.0
+Flask-Migrate>=4.0.0
+Flask-Login>=0.6.2
+Flask-WTF>=1.1.0
+WTForms>=3.0.0
+
+# Database
+SQLAlchemy>=2.0.0
+
+# Security
+Werkzeug>=2.3.0  # For password hashing
+email-validator>=2.0.0  # For email validation in WTForms
+
+# Utilities
+python-dotenv>=1.0.0
+
+# Production server
+gunicorn>=21.0.0
+
+# PostgreSQL support
+psycopg2-binary>=2.9.0
+

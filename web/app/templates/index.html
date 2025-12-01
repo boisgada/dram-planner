@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Dram Planner - Home{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Welcome to Dram Planner</h1>
+    <p>Manage your spirits collection and create tasting schedules.</p>
+    
+    {% if not current_user.is_authenticated %}
+        <p style="margin-top: 2rem;">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+            <a href="{{ url_for('auth.login') }}" class="btn">Login</a>
+        </p>
+    {% else %}
+        <p style="margin-top: 2rem;">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+        </p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Features</h2>
+    <ul style="list-style: none; padding: 0;">
+        <li style="padding: 0.5rem 0;">📊 Collection Management</li>
+        <li style="padding: 0.5rem 0;">📅 Automated Tasting Schedules</li>
+        <li style="padding: 0.5rem 0;">📝 Tasting Notes & Ratings</li>
+        <li style="padding: 0.5rem 0;">📷 Barcode Scanning</li>
+        <li style="padding: 0.5rem 0;">⚙️ Customizable Preferences</li>
+    </ul>
+</div>
+{% endblock %}
+

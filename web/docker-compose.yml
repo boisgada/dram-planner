@@ -1,0 +1,56 @@
+services:
+  web:
+    build: .
+    container_name: dram-planner-web
+    ports:
+      - "127.0.0.1:5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - DATABASE_URL=postgresql://dramplanner:${DB_PASSWORD:-dramplanner}@db:5432/dramplanner
+    volumes:
+      - ./uploads:/app/uploads
+      - ./exports:/app/exports
+      - ./instance:/app/instance
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - dram-planner-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: dram-planner-db
+    environment:
+      - POSTGRES_USER=dramplanner
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-dramplanner}
+      - POSTGRES_DB=dramplanner
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - dram-planner-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dramplanner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Redis for caching/sessions (future enhancement)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: dram-planner-redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - dram-planner-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dram-planner-network:
+    driver: bridge
+

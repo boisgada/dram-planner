@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - Dram Planner{% endblock %}
+
+{% block content %}
+<h1>Settings</h1>
+
+<div class="card">
+    <h2>User Preferences</h2>
+    <form id="config-form" onsubmit="saveConfig(event)">
+        <div class="form-group">
+            <label>Tasting Frequency</label>
+            <select name="tasting_frequency" id="tasting_frequency" onchange="toggleCustomInterval()">
+                <option value="weekly">Weekly</option>
+                <option value="bi-weekly">Bi-weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="custom">Custom</option>
+            </select>
+        </div>
+        
+        <div class="form-group" id="custom-interval-group" style="display: none;">
+            <label>Custom Interval (days)</label>
+            <input type="number" name="custom_interval_days" id="custom_interval_days" min="1" value="7">
+        </div>
+        
+        <div class="form-group">
+            <label>Preferred Days (comma-separated, e.g., Friday,Saturday)</label>
+            <input type="text" name="preferred_days" id="preferred_days" placeholder="Friday, Saturday">
+        </div>
+        
+        <div class="form-group">
+            <label>Avoid Dates (comma-separated, YYYY-MM-DD format)</label>
+            <input type="text" name="avoid_dates" id="avoid_dates" placeholder="2024-12-25, 2025-01-01">
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="seasonal_adjustments" id="seasonal_adjustments">
+                Enable Seasonal Adjustments (lighter in summer, heavier in winter)
+            </label>
+        </div>
+        
+        <div class="form-group">
+            <label>Minimum Days Between Same Category</label>
+            <input type="number" name="min_days_between_category" id="min_days_between_category" min="0" value="0">
+        </div>
+        
+        <div class="form-group">
+            <label>Default Schedule Duration (weeks)</label>
+            <input type="number" name="default_schedule_weeks" id="default_schedule_weeks" min="1" value="104">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Save Preferences</button>
+    </form>
+</div>
+
+<script>
+function toggleCustomInterval() {
+    const frequency = document.getElementById('tasting_frequency').value;
+    document.getElementById('custom-interval-group').style.display = 
+        frequency === 'custom' ? 'block' : 'none';
+}
+
+function loadConfig() {
+    fetch('/api/config')
+        .then(response => response.json())
+        .then(config => {
+            document.getElementById('tasting_frequency').value = config.tasting_frequency || 'weekly';
+            document.getElementById('custom_interval_days').value = config.custom_interval_days || 7;
+            document.getElementById('preferred_days').value = config.preferred_days.join(', ') || '';
+            document.getElementById('avoid_dates').value = config.avoid_dates.join(', ') || '';
+            document.getElementById('seasonal_adjustments').checked = config.seasonal_adjustments || false;
+            document.getElementById('min_days_between_category').value = config.min_days_between_category || 0;
+            document.getElementById('default_schedule_weeks').value = config.default_schedule_weeks || 104;
+            toggleCustomInterval();
+        })
+        .catch(error => console.error('Error loading config:', error));
+}
+
+function saveConfig(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = {
+        tasting_frequency: formData.get('tasting_frequency'),
+        custom_interval_days: parseInt(formData.get('custom_interval_days')) || 7,
+        preferred_days: formData.get('preferred_days').split(',').map(d => d.trim()).filter(d => d),
+        avoid_dates: formData.get('avoid_dates').split(',').map(d => d.trim()).filter(d => d),
+        seasonal_adjustments: formData.get('seasonal_adjustments') === 'on',
+        min_days_between_category: parseInt(formData.get('min_days_between_category')) || 0,
+        default_schedule_weeks: parseInt(formData.get('default_schedule_weeks')) || 104
+    };
+    
+    fetch('/api/config', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Preferences saved successfully!');
+    })
+    .catch(error => {
+        console.error('Error saving config:', error);
+        alert('Error saving preferences');
+    });
+}
+
+// Load config on page load
+loadConfig();
+</script>
+{% endblock %}
+

@@ -1,0 +1,29 @@
+# Development docker-compose configuration
+# Uses SQLite for simplicity, hot-reload enabled
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dram-planner-web-dev
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - SECRET_KEY=dev-secret-key
+      - DATABASE_URL=sqlite:////app/instance/dram_planner.db
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+      - ./exports:/app/exports
+      - ./instance:/app/instance
+    restart: unless-stopped
+    networks:
+      - dram-planner-network
+
+networks:
+  dram-planner-network:
+    driver: bridge
+
