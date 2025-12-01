@@ -142,8 +142,9 @@ Enhance import capabilities to support multiple formats and external sources.
 ---
 
 #### ENH-004: Hosted Web Application
-**Status:** 🟡 Pending  
+**Status:** 🔵 In Progress  
 **Added:** 2025-01-01  
+**Started:** 2025-01-01  
 **Priority:** 🟡 Medium  
 **Effort:** 1-2 weeks  
 **Dependencies:** Web framework (Flask/FastAPI), database (SQLite/PostgreSQL), hosting platform
@@ -152,18 +153,27 @@ Enhance import capabilities to support multiple formats and external sources.
 Convert Dram Planner from CLI tool to a hosted web application for easier access and multi-device support.
 
 **Features:**
-- [ ] Web framework setup (Flask or FastAPI)
-- [ ] RESTful API for all operations
+- [x] Web framework setup (Flask)
+- [x] RESTful API for all operations
+- [x] Database models (SQLite/PostgreSQL ready)
+- [x] User authentication and accounts
 - [ ] Web UI for collection management
 - [ ] Web UI for schedule viewing and management
-- [ ] User authentication and accounts
-- [ ] Database migration from JSON to SQLite/PostgreSQL
 - [ ] Responsive design (mobile-friendly)
 - [ ] Hosting setup (Heroku, Railway, Render, or similar)
 - [ ] Data export/import functionality
 - [ ] Calendar integration (iCal export)
 - [ ] Photo uploads for bottles
 - [ ] Statistics and analytics dashboard
+
+**Implementation Notes:**
+- Flask application structure created
+- Database models: User, Bottle, Schedule, ScheduleItem, UserConfig
+- RESTful API endpoints for bottles, schedules, config, and auth
+- Authentication system with registration and login
+- SQLite database (PostgreSQL ready via DATABASE_URL)
+- Application entry point and configuration system
+- **Next:** Web UI templates and frontend
 
 **Acceptance Criteria:**
 - Users can access application via web browser
