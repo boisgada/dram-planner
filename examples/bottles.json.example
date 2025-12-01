@@ -1,0 +1,59 @@
+{
+  "bottles": [
+    {
+      "name": "Buffalo Trace",
+      "category": "bourbon",
+      "abv": 45.0,
+      "price_paid": 25.99,
+      "purchase_date": "2023-01-15",
+      "notes": "Gift from friend",
+      "barcode": ""
+    },
+    {
+      "name": "Macallan 12",
+      "category": "scotch",
+      "abv": 43.0,
+      "price_paid": 65.00,
+      "purchase_date": "2023-02-20",
+      "notes": "",
+      "barcode": ""
+    },
+    {
+      "name": "Jameson",
+      "category": "irish",
+      "abv": 40.0,
+      "price_paid": 22.50,
+      "purchase_date": "2023-03-10",
+      "notes": "",
+      "barcode": ""
+    },
+    {
+      "name": "Bombay Sapphire",
+      "category": "gin",
+      "abv": 47.0,
+      "price_paid": 28.00,
+      "purchase_date": "2023-04-05",
+      "notes": "",
+      "barcode": ""
+    },
+    {
+      "name": "Patrón Silver",
+      "category": "tequila",
+      "abv": 40.0,
+      "price_paid": 45.00,
+      "purchase_date": "2023-05-12",
+      "notes": "",
+      "barcode": ""
+    },
+    {
+      "name": "Grand Marnier",
+      "category": "liqueur",
+      "abv": 40.0,
+      "price_paid": 38.00,
+      "purchase_date": "2023-06-01",
+      "notes": "",
+      "barcode": ""
+    }
+  ]
+}
+

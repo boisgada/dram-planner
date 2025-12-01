@@ -7,13 +7,15 @@ A comprehensive Python-based system for managing your spirits collection and cre
 
 ## ✨ Features
 
-- 📅 **Tasting Schedule Generation** - Automatically create 2-year (104 weeks) tasting schedules
+- 📅 **Tasting Schedule Generation** - Automatically create customizable tasting schedules
+- ⚙️ **User Preferences** - Customize frequency, preferred days, avoid dates, category preferences, and seasonal adjustments
 - 📊 **Collection Management** - Track your entire spirits collection in one place
 - 📝 **Tasting Notes** - Record detailed notes and ratings for each tasting
 - 📈 **Progress Tracking** - Monitor your progress by category and overall
 - 🎯 **Smart Scheduling** - Prioritizes untasted bottles and ensures category variety
 - 💻 **CLI Interface** - Powerful command-line tools for all operations
-- 📥 **CSV Import** - Bulk import your collection from CSV files
+- 📥 **Multiple Import Formats** - Import from CSV, JSON, or Excel files
+- 📷 **Barcode Scanning** - Automatic bottle lookup via barcode/UPC scanning
 - 🆓 **100% Free** - No subscriptions, no limitations, completely open-source
 
 ## 🚀 Quick Installation
@@ -31,8 +33,17 @@ python3 --version  # Should be 3.6 or higher
 
 ## 📋 Requirements
 
-- **Python 3.6+** (uses only standard library - no dependencies!)
-- **No external packages required** - completely self-contained
+- **Python 3.6+** (core functionality uses only standard library)
+- **Optional Dependencies** (for advanced features):
+  - `requests` - For barcode lookup via Open Food Facts API
+  - `pyzbar` + `pillow` - For barcode scanning from images
+  - `openpyxl` - For Excel (.xlsx) import support
+
+Install optional dependencies:
+```bash
+pip install requests pyzbar pillow openpyxl
+# On macOS, you may also need: brew install zbar
+```
 
 ## Quick Start
 
@@ -44,42 +55,90 @@ python3 add_bottle.py add "Buffalo Trace" bourbon --abv 45.0 --price 25.99
 python3 add_bottle.py add "Macallan 12" scotch --abv 43.0 --price 65.00
 ```
 
-#### Option B: Bulk import from CSV
-Create a CSV file (`bottles.csv`) with format:
-```csv
-name,category,abv,price_paid,purchase_date,notes
-Buffalo Trace,bourbon,45.0,25.99,2023-01-15,
-Macallan 12,scotch,43.0,65.00,2023-02-20,
+#### Option B: Add via barcode lookup
+```bash
+# Manual UPC entry
+python3 add_bottle.py barcode 012345678901 --price 25.99
+
+# Scan from image file
+python3 add_bottle.py barcode /path/to/barcode_image.jpg
 ```
 
-Then import:
+#### Option C: Bulk import from CSV, JSON, or Excel
+**CSV Import:**
+Create a CSV file (`bottles.csv`) with format:
+```csv
+name,category,abv,price_paid,purchase_date,notes,barcode
+Buffalo Trace,bourbon,45.0,25.99,2023-01-15,,
+Macallan 12,scotch,43.0,65.00,2023-02-20,,
+```
+
 ```bash
+# Preview before importing
+python3 add_bottle.py csv bottles.csv --preview
+
+# Import
 python3 add_bottle.py csv bottles.csv
 ```
 
-### 2. Generate Your Schedule
+**JSON Import:**
+```bash
+python3 add_bottle.py json bottles.json --preview
+python3 add_bottle.py json bottles.json
+```
+
+**Excel Import:**
+```bash
+python3 add_bottle.py excel bottles.xlsx --preview
+python3 add_bottle.py excel bottles.xlsx --sheet "My Collection"
+```
+
+### 2. Configure Your Preferences (Optional)
+
+Customize your tasting schedule with user preferences:
+```bash
+# View current configuration
+python3 tasting_manager.py config show
+
+# Set preferred tasting days (e.g., Fridays only)
+python3 tasting_manager.py config set user_preferences.preferred_days Friday
+
+# Set tasting frequency
+python3 tasting_manager.py config set user_preferences.tasting_frequency bi-weekly
+
+# Add dates to avoid
+python3 tasting_manager.py config set user_preferences.avoid_dates "2024-12-25,2025-01-01"
+
+# Enable seasonal adjustments (lighter in summer, heavier in winter)
+python3 tasting_manager.py config set user_preferences.seasonal_adjustments true
+
+# Edit config file directly
+python3 tasting_manager.py config edit
+```
+
+### 3. Generate Your Schedule
 
 ```bash
+# Generate with default settings (or your configured preferences)
 python3 schedule_generator.py
-```
 
-This creates a 2-year schedule starting today. To preview first 10 weeks:
-```bash
+# Preview first 10 weeks
 python3 schedule_generator.py --preview
-```
 
-To start on a specific date:
-```bash
+# Start on a specific date
 python3 schedule_generator.py --start-date 2024-01-01
+
+# Custom duration (in weeks)
+python3 schedule_generator.py --weeks 156  # 3 years
 ```
 
-### 3. View Your Schedule
+### 4. View Your Schedule
 
 ```bash
 python3 tasting_manager.py schedule --weeks 10
 ```
 
-### 4. Record a Tasting
+### 5. Record a Tasting
 
 After tasting a bottle:
 ```bash
@@ -91,7 +150,7 @@ Where:
 - `7.5` is your rating (0-10)
 - `"..."` are your tasting notes
 
-### 5. Track Progress
+### 6. Track Progress
 
 ```bash
 python3 tasting_manager.py progress
@@ -130,6 +189,35 @@ python3 tasting_manager.py schedule
 python3 tasting_manager.py schedule --weeks 20
 ```
 
+## Configuration
+
+Dram Planner uses a `config.json` file to store user preferences. The file is automatically created on first run with defaults. You can manage it via CLI commands:
+
+```bash
+# Show current config
+python3 tasting_manager.py config show
+
+# Set a preference
+python3 tasting_manager.py config set user_preferences.tasting_frequency monthly
+
+# Reset to defaults
+python3 tasting_manager.py config reset
+
+# Edit directly
+python3 tasting_manager.py config edit
+```
+
+### Available Preferences
+
+- `tasting_frequency`: "weekly", "bi-weekly", "monthly", or "custom"
+- `custom_interval_days`: Days between tastings (for custom frequency)
+- `preferred_days`: List of preferred days (e.g., ["Friday", "Saturday"])
+- `avoid_dates`: Dates to skip (e.g., ["2024-12-25", "2025-01-01"])
+- `category_preferences`: Weight multipliers (e.g., {"bourbon": 2.0, "scotch": 1.5})
+- `seasonal_adjustments`: Enable seasonal preferences (true/false)
+- `min_days_between_category`: Minimum days between same category tastings
+- `default_schedule_weeks`: Default schedule duration (default: 104)
+
 ## Collection Structure
 
 Each bottle in `collection.json` contains:
@@ -141,6 +229,7 @@ Each bottle in `collection.json` contains:
 - `purchase_date`: When you bought it
 - `opened_date`: When you first opened it
 - `notes`: General notes
+- `barcode`: Barcode/UPC code (if added via barcode lookup)
 - `tasted`: Boolean - has it been tasted?
 - `tasting_date`: Date of tasting
 - `rating`: Your rating (0-10)
@@ -154,18 +243,52 @@ Each bottle in `collection.json` contains:
 4. **Track Evolution**: Re-taste bottles after 6-12 months to see how your palate changes
 5. **Category Balance**: The schedule tries to mix categories, but you can manually adjust if desired
 
-## Customization
+## Import Formats
 
-### Adjust Schedule Duration
-```bash
-python3 schedule_generator.py --weeks 156  # 3 years instead of 2
+### CSV Format
+Supports flexible CSV formats with or without headers:
+```csv
+name,category,abv,price_paid,purchase_date,notes,barcode
+Buffalo Trace,bourbon,45.0,25.99,2023-01-15,,
+Macallan 12,scotch,43.0,65.00,2023-02-20,,
 ```
 
-### Modify Schedule Logic
-Edit `schedule_generator.py` to adjust:
-- Category rotation patterns
-- Seasonal preferences
-- Repeat frequency
+### JSON Format
+Supports array or object format:
+```json
+[
+  {
+    "name": "Buffalo Trace",
+    "category": "bourbon",
+    "abv": 45.0,
+    "price_paid": 25.99,
+    "purchase_date": "2023-01-15"
+  }
+]
+```
+
+Or:
+```json
+{
+  "bottles": [
+    {
+      "name": "Buffalo Trace",
+      "category": "bourbon",
+      "abv": 45.0
+    }
+  ]
+}
+```
+
+### Excel Format
+Supports `.xlsx` files with flexible header mapping. Common headers are automatically detected:
+- Name: name, bottle, spirit, product, title
+- Category: category, type, kind
+- ABV: abv, alcohol, alcohol %, proof
+- Price: price, price_paid, cost, purchase price
+- Date: purchase_date, date, purchase date, bought
+- Notes: notes, note, description, desc
+- Barcode: barcode, upc, ean, code
 
 ## Example Workflow
 
@@ -205,15 +328,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔮 Future Enhancements
 
-Ideas for future versions (contributions welcome!):
-- Web interface for easier note-taking
-- Photo storage for bottle labels
-- Statistical analysis of preferences
-- Export to spreadsheet (CSV, Excel)
-- Calendar export (iCal format)
-- Integration with spirit databases (e.g., Distiller API)
-- Mobile-friendly web interface
-- Reminder notifications
+Planned enhancements (see [ENHANCEMENT_QUEUE.md](ENHANCEMENT_QUEUE.md)):
+- 🌐 **Hosted Web Application** - Web interface for easier access
+- 📱 **Mobile Applications** - iPhone and Android apps
+- 📊 **Enhanced Analytics** - Statistical analysis and insights
+- 📅 **Calendar Export** - iCal format for calendar integration
+- 🖼️ **Photo Storage** - Upload and store bottle photos
+
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## 📚 Documentation
 
