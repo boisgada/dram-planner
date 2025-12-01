@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 4
+- **Total Items:** 5
 - **In Progress:** 0
 - **Completed:** 2
-- **Pending:** 2
+- **Pending:** 3
 
 ## Priority Levels
 
@@ -169,6 +169,54 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
 - Evaluate hosting costs and options
 - Plan for user data privacy and security
 - Consider migration path for existing users
+
+**Related Issues:** None
+
+---
+
+#### ENH-005: Mobile Applications (iPhone & Android)
+**Status:** 🟡 Pending  
+**Added:** 2025-01-01  
+**Priority:** 🟡 Medium  
+**Effort:** 3-4 weeks  
+**Dependencies:** Mobile development framework (React Native, Flutter, or native), API backend
+
+**Description:**
+Create native or cross-platform mobile applications for iPhone and Android to provide on-the-go access to Dram Planner.
+
+**Features:**
+- [ ] Cross-platform framework selection (React Native, Flutter, or native)
+- [ ] iOS app development (iPhone/iPad)
+- [ ] Android app development
+- [ ] Collection management interface
+- [ ] Schedule viewing and management
+- [ ] Barcode scanning using device camera
+- [ ] Tasting note entry
+- [ ] Photo capture for bottles
+- [ ] Offline data synchronization
+- [ ] Push notifications for scheduled tastings
+- [ ] Calendar integration
+- [ ] Data sync with web/CLI versions
+- [ ] App store submission (iOS App Store, Google Play)
+
+**Acceptance Criteria:**
+- Apps available on iOS App Store and Google Play Store
+- All core functionality available on mobile
+- Barcode scanning works reliably
+- Offline mode supported
+- Data syncs across devices
+- Native mobile UX/UI design
+- Apps pass store review guidelines
+
+**Considerations:**
+- Cross-platform vs native development trade-offs
+- API backend required (may depend on ENH-004)
+- App store fees and requirements
+- Device camera permissions for barcode scanning
+- Offline-first architecture
+- Data synchronization strategy
+- User authentication and cloud storage
+- Consider PWA (Progressive Web App) as alternative
 
 **Related Issues:** None
 
