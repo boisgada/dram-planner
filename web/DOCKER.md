@@ -4,13 +4,24 @@ Dram Planner Web Application can be deployed as a self-contained Docker containe
 
 ## Quick Start
 
+**This is the only supported way to run the web application.**
+
 ### Development (with hot-reload)
 
 ```bash
 # Build and run development container
+cd web
 docker-compose -f docker-compose.dev.yml up --build
 
 # Access at http://localhost:5000
+```
+
+**First time setup:**
+```bash
+# Initialize database (in another terminal while container is running)
+docker-compose -f docker-compose.dev.yml exec web flask db init
+docker-compose -f docker-compose.dev.yml exec web flask db migrate -m "Initial migration"
+docker-compose -f docker-compose.dev.yml exec web flask db upgrade
 ```
 
 ### Production

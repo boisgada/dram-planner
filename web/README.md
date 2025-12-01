@@ -13,42 +13,47 @@ Web interface for Dram Planner built with Flask.
 
 ## Setup
 
-### 1. Install Dependencies
+**This application uses Docker exclusively.** See [DOCKER.md](DOCKER.md) for detailed instructions.
+
+### Quick Start
 
 ```bash
-cd web
-pip install -r requirements.txt
+# Development (with hot-reload)
+docker-compose -f docker-compose.dev.yml up --build
+
+# Production
+docker-compose up --build
 ```
 
-### 2. Set Environment Variables
+The application will be available at http://localhost:5000
 
-Create a `.env` file:
+### First Time Setup
+
+1. **Build and start containers:**
+   ```bash
+   docker-compose -f docker-compose.dev.yml up --build
+   ```
+
+2. **Initialize database (in another terminal):**
+   ```bash
+   docker-compose -f docker-compose.dev.yml exec web flask db init
+   docker-compose -f docker-compose.dev.yml exec web flask db migrate -m "Initial migration"
+   docker-compose -f docker-compose.dev.yml exec web flask db upgrade
+   ```
+
+3. **Access the application:**
+   - Open http://localhost:5000 in your browser
+   - Register a new account
+   - Start using Dram Planner!
+
+### Environment Variables
+
+Create a `.env` file (optional, defaults work for development):
 
 ```bash
-FLASK_ENV=development
 SECRET_KEY=your-secret-key-here
-DATABASE_URL=sqlite:///dram_planner.db
-```
-
-### 3. Initialize Database
-
-```bash
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
-```
-
-### 4. Run Application
-
-```bash
-python run.py
-```
-
-Or using Flask CLI:
-
-```bash
-export FLASK_APP=run.py
-flask run
+DB_PASSWORD=your-database-password
+FLASK_ENV=development
 ```
 
 ## API Endpoints
@@ -85,47 +90,58 @@ flask run
 
 ```bash
 # Create migration
-flask db migrate -m "Description"
+docker-compose -f docker-compose.dev.yml exec web flask db migrate -m "Description"
 
 # Apply migration
-flask db upgrade
+docker-compose -f docker-compose.dev.yml exec web flask db upgrade
 
 # Rollback migration
-flask db downgrade
+docker-compose -f docker-compose.dev.yml exec web flask db downgrade
+```
+
+### View Logs
+
+```bash
+# All logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Web service only
+docker-compose -f docker-compose.dev.yml logs -f web
+```
+
+### Access Container Shell
+
+```bash
+docker-compose -f docker-compose.dev.yml exec web bash
 ```
 
 ### Testing
 
 ```bash
 # Run tests (when implemented)
-pytest
+docker-compose -f docker-compose.dev.yml exec web pytest
 ```
 
 ## Deployment
 
-### Docker (Recommended)
+### Production Deployment
 
-The application is containerized for easy deployment. See [DOCKER.md](DOCKER.md) for detailed instructions.
+See [DOCKER.md](DOCKER.md) for comprehensive deployment instructions.
 
 **Quick Start:**
 ```bash
-# Production
+# Set environment variables
+export SECRET_KEY=your-secret-key
+export DB_PASSWORD=your-db-password
+
+# Start production stack
 docker-compose up -d
 
-# Development
-docker-compose -f docker-compose.dev.yml up
+# Initialize database
+docker-compose exec web flask db upgrade
 ```
 
-### Traditional Deployment
-
-1. Set `FLASK_ENV=production`
-2. Use PostgreSQL: `DATABASE_URL=postgresql://...`
-3. Set strong `SECRET_KEY`
-4. Use production WSGI server (gunicorn)
-
-```bash
-gunicorn -w 4 -b 0.0.0.0:8000 run:app
-```
+The application uses Docker exclusively for all deployment scenarios.
 
 ## Project Structure
 
