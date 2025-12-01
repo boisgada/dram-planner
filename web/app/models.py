@@ -232,3 +232,130 @@ class MasterBeverage(db.Model):
     def __repr__(self):
         return f'<MasterBeverage {self.name}>'
 
+
+class UserGroup(db.Model):
+    """User groups for shared tasting experiences."""
+    __tablename__ = 'user_groups'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    is_private = db.Column(db.Boolean, default=False)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    creator = db.relationship('User', backref=db.backref('created_groups', lazy=True))
+    members = db.relationship('GroupMembership', back_populates='group', cascade='all, delete-orphan')
+    schedules = db.relationship('GroupSchedule', back_populates='group', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'is_private': self.is_private,
+            'created_by': self.creator.username if self.creator else None,
+            'member_count': len(self.members),
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+
+    def __repr__(self):
+        return f'<UserGroup {self.name}>'
+
+
+class GroupMembership(db.Model):
+    """Group membership relationships."""
+    __tablename__ = 'group_memberships'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('user_groups.id'), nullable=False)
+    role = db.Column(db.String(20), default='member')  # 'admin', 'moderator', 'member'
+    joined_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref=db.backref('group_memberships', lazy=True))
+    group = db.relationship('UserGroup', back_populates='members')
+
+    __table_args__ = (db.UniqueConstraint('user_id', 'group_id', name='unique_user_group'),)
+
+    def __repr__(self):
+        return f'<GroupMembership user={self.user_id} group={self.group_id}>'
+
+
+class GroupSchedule(db.Model):
+    """Shared schedules for groups."""
+    __tablename__ = 'group_schedules'
+
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('user_groups.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    start_date = db.Column(db.Date, nullable=False)
+    weeks = db.Column(db.Integer, nullable=False, default=52)
+    is_active = db.Column(db.Boolean, default=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    group = db.relationship('UserGroup', back_populates='schedules')
+    creator = db.relationship('User', backref=db.backref('created_group_schedules', lazy=True))
+    items = db.relationship('GroupScheduleItem', back_populates='schedule', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'group_id': self.group_id,
+            'name': self.name,
+            'description': self.description,
+            'start_date': self.start_date.isoformat(),
+            'weeks': self.weeks,
+            'is_active': self.is_active,
+            'created_by': self.creator.username if self.creator else None,
+            'created_at': self.created_at.isoformat(),
+            'item_count': len(self.items)
+        }
+
+    def __repr__(self):
+        return f'<GroupSchedule {self.name}>'
+
+
+class GroupScheduleItem(db.Model):
+    """Individual items in group schedules."""
+    __tablename__ = 'group_schedule_items'
+
+    id = db.Column(db.Integer, primary_key=True)
+    schedule_id = db.Column(db.Integer, db.ForeignKey('group_schedules.id'), nullable=False)
+    week = db.Column(db.Integer, nullable=False)
+    tasting_date = db.Column(db.Date, nullable=False)
+    bottle_name = db.Column(db.String(255), nullable=False)
+    category = db.Column(db.String(50))
+    notes = db.Column(db.Text)
+    completed = db.Column(db.Boolean, default=False)
+    completed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    completed_at = db.Column(db.DateTime)
+
+    # Relationships
+    schedule = db.relationship('GroupSchedule', back_populates='items')
+    completed_by = db.relationship('User', backref=db.backref('completed_group_items', lazy=True))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'schedule_id': self.schedule_id,
+            'week': self.week,
+            'tasting_date': self.tasting_date.isoformat(),
+            'bottle_name': self.bottle_name,
+            'category': self.category,
+            'notes': self.notes,
+            'completed': self.completed,
+            'completed_by': self.completed_by.username if self.completed_by else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None
+        }
+
+    def __repr__(self):
+        return f'<GroupScheduleItem week={self.week} bottle={self.bottle_name}>'
+

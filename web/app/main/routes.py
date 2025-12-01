@@ -49,3 +49,10 @@ def catalog():
     """Beverage catalog browsing page."""
     return render_template('catalog.html')
 
+
+@bp.route('/groups')
+@login_required
+def groups():
+    """User groups page."""
+    return render_template('groups.html')
+
