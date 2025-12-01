@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 14
+- **Total Items:** 15
 - **In Progress:** 0
 - **Completed:** 8
-- **Pending:** 6
+- **Pending:** 7
 
 ## Priority Levels
 
@@ -26,10 +26,11 @@ Based on dependencies and user value, the prioritized development sequence is:
 4. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
 5. **ENH-012: Whisky Database Integration & Public Lists** (✅ Completed) - Extends catalog with whisky data
 6. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
-7. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-8. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
-9. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-10. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+7. **ENH-015: Catalog Management & Administration** (🟡 Medium) - Catalog administration
+8. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
+9. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+10. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+11. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
@@ -815,6 +816,66 @@ Integrate with publicly available whisky databases and lists, providing search a
 - **Legal:** Ensure compliance with database usage terms
 
 **Related Issues:** Extends ENH-006 master catalog with whisky-specific data sources
+
+---
+
+#### ENH-015: Catalog Management & Administration
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🟡 Medium
+**Effort:** 2-3 weeks
+**Dependencies:** ENH-006 (Master Beverage Catalog)
+
+**Description:**
+Add administrative functionality to manage and maintain the master beverage catalog. Allow authorized users to modify, add, delete, and curate catalog entries to ensure data quality and completeness.
+
+**Features:**
+- [ ] **Admin Interface:**
+  - [ ] Dedicated admin section for catalog management
+  - [ ] Role-based access control (admin/moderator privileges)
+  - [ ] Bulk operations for catalog maintenance
+- [ ] **Entry Management:**
+  - [ ] Add new beverages to catalog manually
+  - [ ] Edit existing catalog entries (name, brand, category, ABV, etc.)
+  - [ ] Delete duplicate or incorrect entries
+  - [ ] Merge duplicate entries
+  - [ ] Mark entries as verified/unverified
+- [ ] **Data Quality Tools:**
+  - [ ] Validation rules for catalog entries
+  - [ ] Duplicate detection and resolution
+  - [ ] Data consistency checking
+  - [ ] Bulk import/export for catalog maintenance
+- [ ] **Community Contributions:**
+  - [ ] User suggestions for new catalog entries
+  - [ ] Review and approval workflow for user submissions
+  - [ ] Community voting on entry accuracy
+  - [ ] Contributor recognition system
+- [ ] **Catalog Analytics:**
+  - [ ] Usage statistics (most viewed/searched entries)
+  - [ ] Data completeness metrics
+  - [ ] User contribution analytics
+  - [ ] Catalog growth and maintenance reports
+- [ ] **Import/Export Tools:**
+  - [ ] Export catalog data for backup/archiving
+  - [ ] Import from external sources with validation
+  - [ ] CSV/JSON bulk operations
+  - [ ] Catalog synchronization tools
+
+**Acceptance Criteria:**
+- Admins can add, edit, and delete catalog entries
+- Data validation prevents invalid entries
+- Duplicate detection and merging tools available
+- Community contribution system implemented
+- Catalog analytics and reporting available
+
+**Considerations:**
+- **Data Integrity:** Ensure catalog changes don't break existing user collections
+- **User Impact:** Changes to catalog entries should be communicated to affected users
+- **Moderation:** Community contributions need review before approval
+- **Backup:** Full catalog backup before major changes
+- **Audit Trail:** Track all catalog modifications
+
+**Related Issues:** Extends ENH-006 master catalog with administrative capabilities
 
 ---
 
