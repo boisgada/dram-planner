@@ -5,10 +5,34 @@
 {% block content %}
 <h1>My Collection</h1>
 
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2>Bottles</h2>
-        <button class="btn btn-primary" onclick="showAddBottleForm()">Add Bottle</button>
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h2>Bottles</h2>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn" onclick="showImportForm()">Import</button>
+                <button class="btn" onclick="exportBottles('json')">Export JSON</button>
+                <button class="btn" onclick="exportBottles('csv')">Export CSV</button>
+                <button class="btn btn-primary" onclick="showAddBottleForm()">Add Bottle</button>
+            </div>
+        </div>
+
+    <div id="import-form" style="display: none; margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+        <h3>Import Bottles</h3>
+        <form id="import-form-element" enctype="multipart/form-data" onsubmit="importBottles(event)">
+            <div class="form-group">
+                <label>File (CSV or JSON)</label>
+                <input type="file" name="file" accept=".csv,.json" required>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="preview" id="import-preview">
+                    Preview only (don't import)
+                </label>
+            </div>
+            <button type="submit" class="btn btn-success">Import</button>
+            <button type="button" class="btn" onclick="hideImportForm()">Cancel</button>
+        </form>
+        <div id="import-results" style="margin-top: 1rem;"></div>
     </div>
 
     <div id="add-bottle-form" style="display: none; margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
@@ -187,6 +211,66 @@ function viewBottle(bottleId) {
         .then(bottle => {
             alert(`Bottle: ${bottle.name}\nCategory: ${bottle.category}\nABV: ${bottle.abv}%\nNotes: ${bottle.notes || 'None'}`);
         });
+}
+
+function showImportForm() {
+    document.getElementById('import-form').style.display = 'block';
+    document.getElementById('add-bottle-form').style.display = 'none';
+}
+
+function hideImportForm() {
+    document.getElementById('import-form').style.display = 'none';
+    document.getElementById('import-form-element').reset();
+    document.getElementById('import-results').innerHTML = '';
+}
+
+function exportBottles(format) {
+    window.location.href = `/api/export/bottles?format=${format}`;
+}
+
+function importBottles(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const preview = document.getElementById('import-preview').checked;
+    formData.append('preview', preview);
+    
+    const resultsDiv = document.getElementById('import-results');
+    resultsDiv.innerHTML = '<p>Importing...</p>';
+    
+    fetch('/api/import/bottles', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            resultsDiv.innerHTML = `<div style="color: #e74c3c; padding: 1rem; background: #fee; border-radius: 4px;">
+                <strong>Error:</strong> ${data.error}
+                ${data.errors ? '<ul>' + data.errors.map(e => '<li>' + e + '</li>').join('') + '</ul>' : ''}
+            </div>`;
+        } else if (data.preview) {
+            resultsDiv.innerHTML = `<div style="padding: 1rem; background: #e8f4f8; border-radius: 4px;">
+                <strong>Preview:</strong> ${data.total} bottles found
+                ${data.warnings && data.warnings.length > 0 ? '<p>Warnings: ' + data.warnings.join(', ') + '</p>' : ''}
+                <p>First ${Math.min(10, data.bottles.length)} bottles:</p>
+                <ul>${data.bottles.map(b => '<li>' + b.name + ' (' + b.category + ')</li>').join('')}</ul>
+                <p><em>Uncheck "Preview only" and submit again to import.</em></p>
+            </div>`;
+        } else {
+            resultsDiv.innerHTML = `<div style="color: #27ae60; padding: 1rem; background: #efe; border-radius: 4px;">
+                <strong>Success!</strong> Imported ${data.imported} bottles.
+                ${data.warnings && data.warnings.length > 0 ? '<p>Warnings: ' + data.warnings.join(', ') + '</p>' : ''}
+            </div>`;
+            hideImportForm();
+            loadBottles();
+        }
+    })
+    .catch(error => {
+        console.error('Error importing:', error);
+        resultsDiv.innerHTML = `<div style="color: #e74c3c; padding: 1rem; background: #fee; border-radius: 4px;">
+            <strong>Error:</strong> Failed to import bottles. Please try again.
+        </div>`;
+    });
 }
 
 // Load bottles on page load

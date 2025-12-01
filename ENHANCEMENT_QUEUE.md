@@ -157,14 +157,14 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
 - [x] RESTful API for all operations
 - [x] Database models (SQLite/PostgreSQL ready)
 - [x] User authentication and accounts
-- [ ] Web UI for collection management
-- [ ] Web UI for schedule viewing and management
-- [ ] Responsive design (mobile-friendly)
-- [ ] Hosting setup (Heroku, Railway, Render, or similar)
-- [ ] Data export/import functionality
-- [ ] Calendar integration (iCal export)
+- [x] Web UI for collection management (CRUD operations)
+- [x] Web UI for schedule viewing and management
+- [x] Responsive design (mobile-friendly)
+- [x] Data export/import functionality (CSV, JSON)
+- [x] Calendar integration (iCal export)
+- [x] Statistics and analytics dashboard
 - [ ] Photo uploads for bottles
-- [ ] Statistics and analytics dashboard
+- [ ] Hosting setup (currently on vps05)
 
 **Implementation Notes:**
 - Flask application structure created
@@ -179,7 +179,14 @@ Convert Dram Planner from CLI tool to a hosted web application for easier access
   - docker-compose.yml for production (PostgreSQL)
   - docker-compose.dev.yml for development (SQLite)
   - Comprehensive Docker documentation
-- **Next:** Web UI templates and frontend
+- **Web UI complete:**
+  - Collection management with full CRUD
+  - Schedule generation and viewing
+  - User settings/preferences page
+  - Export/import functionality (CSV, JSON, iCal)
+  - Responsive mobile-friendly design
+  - Enhanced dashboard with statistics
+- **Deployed:** Running on vps05 with localhost-only binding
 
 **Acceptance Criteria:**
 - Users can access application via web browser

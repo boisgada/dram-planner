@@ -37,7 +37,10 @@
 </div>
 
 <div class="card" id="schedule-details" style="display: none;">
-    <h2 id="schedule-name"></h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2 id="schedule-name"></h2>
+        <button class="btn" id="export-schedule-btn" onclick="exportCurrentSchedule()" style="display: none;">Export iCal</button>
+    </div>
     <div id="schedule-items"></div>
 </div>
 
@@ -73,6 +76,7 @@ function loadSchedules() {
                     <td>${new Date(schedule.generated_at).toLocaleDateString()}</td>
                     <td>
                         <button class="btn btn-primary" onclick="viewSchedule(${schedule.id})">View</button>
+                        <button class="btn" onclick="exportSchedule(${schedule.id})">Export iCal</button>
                         <button class="btn btn-danger" onclick="deleteSchedule(${schedule.id})">Delete</button>
                     </td>
                 </tr>`;
@@ -110,11 +114,15 @@ function generateSchedule(event) {
     });
 }
 
+let currentScheduleId = null;
+
 function viewSchedule(scheduleId) {
+    currentScheduleId = scheduleId;
     fetch(`/api/schedules/${scheduleId}`)
         .then(response => response.json())
         .then(schedule => {
             document.getElementById('schedule-name').textContent = schedule.name;
+            document.getElementById('export-schedule-btn').style.display = 'block';
             const itemsDiv = document.getElementById('schedule-items');
             
             let html = '<table><thead><tr><th>Week</th><th>Date</th><th>Bottle</th><th>Category</th><th>ABV</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
@@ -169,6 +177,16 @@ function deleteSchedule(scheduleId) {
             console.error('Error deleting schedule:', error);
             alert('Error deleting schedule');
         });
+    }
+}
+
+function exportSchedule(scheduleId) {
+    window.location.href = `/api/export/schedule/${scheduleId}`;
+}
+
+function exportCurrentSchedule() {
+    if (currentScheduleId) {
+        exportSchedule(currentScheduleId);
     }
 }
 
