@@ -18,7 +18,9 @@ Werkzeug>=2.3.0  # For password hashing
 # Utilities
 python-dotenv>=1.0.0
 
-# Optional: For production
-# gunicorn>=21.0.0
-# psycopg2-binary>=2.9.0  # For PostgreSQL
+# Production server
+gunicorn>=21.0.0
+
+# PostgreSQL support
+psycopg2-binary>=2.9.0
 

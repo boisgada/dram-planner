@@ -103,7 +103,20 @@ pytest
 
 ## Deployment
 
-### Production Setup
+### Docker (Recommended)
+
+The application is containerized for easy deployment. See [DOCKER.md](DOCKER.md) for detailed instructions.
+
+**Quick Start:**
+```bash
+# Production
+docker-compose up -d
+
+# Development
+docker-compose -f docker-compose.dev.yml up
+```
+
+### Traditional Deployment
 
 1. Set `FLASK_ENV=production`
 2. Use PostgreSQL: `DATABASE_URL=postgresql://...`
