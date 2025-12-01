@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 5
+- **Total Items:** 6
 - **In Progress:** 0
 - **Completed:** 3
-- **Pending:** 2
+- **Pending:** 3
 
 ## Priority Levels
 
@@ -255,6 +255,62 @@ Create native or cross-platform mobile applications for iPhone and Android to pr
 
 ---
 
+#### ENH-006: Master Beverage Catalog
+**Status:** 🟡 Pending  
+**Added:** 2025-12-01  
+**Priority:** 🟡 Medium  
+**Effort:** 2-3 weeks  
+**Dependencies:** Database for master list (if maintained locally), or external API integration
+
+**Description:**
+Provide users with a master list/catalog of beverages to select from when adding bottles to their collection, eliminating the need for manual entry of common information.
+
+**Features:**
+- [ ] Research and evaluate options:
+  - [ ] Maintain local master database of beverages
+  - [ ] Integrate with external beverage database/API (e.g., Distiller, Whiskybase, etc.)
+  - [ ] Hybrid approach (local + external lookup)
+- [ ] Searchable beverage catalog
+- [ ] Browse by category, brand, region
+- [ ] Quick-add from catalog to user collection
+- [ ] Pre-populate bottle information (name, category, ABV, etc.)
+- [ ] Allow users to customize imported data before adding
+- [ ] If maintaining local master list:
+  - [ ] Import/export master list functionality
+  - [ ] Admin interface for managing master list
+  - [ ] Community contributions (optional)
+  - [ ] Version control for master list updates
+
+**Acceptance Criteria:**
+- Users can search and browse beverage catalog
+- Users can add bottles from catalog to collection with one click
+- Bottle information is pre-populated from catalog
+- If local master list: can be imported/exported
+- If external API: graceful fallback if API unavailable
+- Catalog search is fast and responsive
+
+**Considerations:**
+- **Local Master List:**
+  - Storage and maintenance overhead
+  - Keeping data current and accurate
+  - Initial data population
+  - Update mechanism
+- **External API:**
+  - API availability and reliability
+  - Rate limits and costs
+  - Data format consistency
+  - Fallback strategy
+- **Hybrid Approach:**
+  - Cache frequently accessed items locally
+  - Use external API for lookups
+  - Best of both worlds
+- Data licensing and attribution requirements
+- User privacy (what data is sent to external APIs)
+
+**Related Issues:** None
+
+---
+
 ### 🟢 Low Priority
 
 *None currently*
@@ -289,5 +345,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-01-01 (ENH-002 completed)
+**Last Updated:** 2025-12-01 (ENH-006 added)
 
