@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Dram Planner{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="stats" id="stats">
+    <div class="stat-card">
+        <h3 id="total-bottles">-</h3>
+        <p>Total Bottles</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="tasted-bottles">-</h3>
+        <p>Tasted</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="untasted-bottles">-</h3>
+        <p>Untasted</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="avg-rating">-</h3>
+        <p>Average Rating</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Quick Actions</h2>
+    <p>
+        <a href="{{ url_for('main.collection') }}" class="btn btn-primary">Manage Collection</a>
+        <a href="{{ url_for('main.schedule') }}" class="btn btn-primary">View Schedule</a>
+        <a href="{{ url_for('main.settings') }}" class="btn">Settings</a>
+    </p>
+</div>
+
+<div class="card">
+    <h2>Recent Activity</h2>
+    <p>Activity feed coming soon...</p>
+</div>
+
+<script>
+// Fetch and display stats
+fetch('/api/bottles/stats')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('total-bottles').textContent = data.total || 0;
+        document.getElementById('tasted-bottles').textContent = data.tasted || 0;
+        document.getElementById('untasted-bottles').textContent = data.untasted || 0;
+        document.getElementById('avg-rating').textContent = 
+            data.average_rating ? data.average_rating.toFixed(1) : 'N/A';
+    })
+    .catch(error => console.error('Error fetching stats:', error));
+</script>
+{% endblock %}
+
