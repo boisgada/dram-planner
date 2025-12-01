@@ -4,10 +4,10 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 12
+- **Total Items:** 14
 - **In Progress:** 0
 - **Completed:** 7
-- **Pending:** 5
+- **Pending:** 7
 
 ## Priority Levels
 
@@ -20,14 +20,16 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 Based on dependencies and user value, the prioritized development sequence is:
 
-1. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
-2. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
-3. **ENH-012: Whisky Database Integration & Public Lists** (🟡 Medium) - Extends catalog with whisky data
-4. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
-5. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-6. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
-7. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-8. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+1. **ENH-013: Security & Vulnerability Assessment** (🔴 Critical) - BLOCKS PUBLIC LAUNCH
+2. **ENH-014: Production Deployment & Infrastructure** (🔴 Critical) - Public deployment
+3. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
+4. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
+5. **ENH-012: Whisky Database Integration & Public Lists** (🟡 Medium) - Extends catalog with whisky data
+6. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
+7. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
+8. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+9. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+10. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
@@ -611,6 +613,142 @@ Add granular customization options for tasting sessions to support diverse tasti
 - **Mobile:** Ensure all customizations work well on mobile devices
 
 **Related Issues:** Builds on ENH-001 user preferences system
+
+---
+
+#### ENH-013: Security & Vulnerability Assessment
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🔴 Critical
+**Effort:** 1-2 weeks
+**Dependencies:** ENH-004 (Web Application), Public deployment readiness
+
+**Description:**
+Perform comprehensive security assessment and vulnerability scanning of the Dram Planner web application before public deployment to www.dram-planner.com. Ensure the application meets security standards for user data protection and safe public access.
+
+**Features:**
+- [ ] **Static Code Analysis:**
+  - [ ] Run security linters (Bandit, Safety, etc.)
+  - [ ] Code review for common vulnerabilities (SQL injection, XSS, CSRF)
+  - [ ] Dependency vulnerability scanning
+  - [ ] Secrets and credential exposure checks
+- [ ] **Dynamic Security Testing:**
+  - [ ] Automated vulnerability scanning (OWASP ZAP, Nessus)
+  - [ ] Penetration testing simulation
+  - [ ] API endpoint security testing
+  - [ ] Authentication and authorization testing
+- [ ] **Infrastructure Security:**
+  - [ ] SSL/TLS configuration review
+  - [ ] Server hardening assessment
+  - [ ] Database security configuration
+  - [ ] Firewall and network security
+- [ ] **Application Security:**
+  - [ ] Input validation and sanitization review
+  - [ ] Session management security
+  - [ ] Password security and storage
+  - [ ] Rate limiting and DoS protection
+- [ ] **Compliance & Best Practices:**
+  - [ ] GDPR/privacy compliance review
+  - [ ] OWASP Top 10 compliance
+  - [ ] Security headers implementation
+  - [ ] Error handling and information leakage
+- [ ] **Deployment Security:**
+  - [ ] Production environment hardening
+  - [ ] Secure configuration management
+  - [ ] Monitoring and logging setup
+  - [ ] Incident response planning
+
+**Acceptance Criteria:**
+- Comprehensive security audit completed
+- All critical/high-risk vulnerabilities resolved
+- Security best practices implemented
+- Deployment-ready security posture
+- Documentation of security measures
+
+**Considerations:**
+- **Timeline:** Must be completed before public launch
+- **Cost:** May require security tools or external consultants
+- **Scope:** Web application, API, database, and infrastructure
+- **Standards:** OWASP guidelines, industry best practices
+- **Maintenance:** Ongoing security monitoring plan
+
+**Related Issues:** Blocks public deployment to www.dram-planner.com
+
+---
+
+#### ENH-014: Production Deployment & Infrastructure
+**Status:** 🟡 Pending
+**Added:** 2025-12-01
+**Priority:** 🔴 Critical
+**Effort:** 2-3 weeks
+**Dependencies:** ENH-013 (Security Assessment), Domain registration
+
+**Description:**
+Plan and execute production deployment of Dram Planner to www.dram-planner.com. Configure infrastructure, domain setup, SSL certificates, and monitoring for public availability.
+
+**Features:**
+- [ ] **Domain & DNS Configuration:**
+  - [ ] CNAME or A record setup for www.dram-planner.com
+  - [ ] SSL certificate provisioning (Let's Encrypt)
+  - [ ] DNS propagation testing
+  - [ ] Domain ownership verification
+- [ ] **Infrastructure Planning:**
+  - [ ] Assess vps05 capacity for production load
+  - [ ] Evaluate dedicated server vs. existing VPS
+  - [ ] Load balancing and scalability planning
+  - [ ] Backup and disaster recovery setup
+- [ ] **Production Environment:**
+  - [ ] Environment variable configuration
+  - [ ] Database migration to production
+  - [ ] Static file serving optimization
+  - [ ] Performance monitoring setup
+- [ ] **Security Hardening:**
+  - [ ] Production SSL/TLS configuration
+  - [ ] Web server security headers
+  - [ ] Database connection security
+  - [ ] API rate limiting and throttling
+- [ ] **Monitoring & Maintenance:**
+  - [ ] Application performance monitoring
+  - [ ] Error tracking and alerting
+  - [ ] Log aggregation and analysis
+  - [ ] Automated backup procedures
+- [ ] **Go-Live Preparation:**
+  - [ ] Staging environment testing
+  - [ ] Load testing and performance validation
+  - [ ] Rollback procedures
+  - [ ] User communication plan
+
+**Deployment Options Assessment:**
+- **Option 1: CNAME to vps05 (Recommended)**
+  - ✅ Simpler setup - reuse existing working infrastructure
+  - ✅ Cost-effective - no additional server costs
+  - ✅ Faster deployment - minimal configuration changes
+  - ⚠️ Resource sharing - monitor performance under load
+  - ⚠️ Single point of failure if vps05 issues
+
+- **Option 2: Dedicated Server**
+  - ✅ Better performance isolation
+  - ✅ Scalability and future growth
+  - ✅ Production-grade reliability
+  - ❌ Higher cost and complexity
+  - ❌ Additional setup and migration time
+
+**Recommendation:** Start with CNAME to vps05 for faster deployment, monitor performance, and scale to dedicated server if needed.
+
+**Acceptance Criteria:**
+- Domain www.dram-planner.com live and accessible
+- SSL certificate properly configured
+- Application running stably in production
+- Monitoring and alerting operational
+- Backup procedures verified
+
+**Considerations:**
+- **Domain:** www.dram-planner.com already registered
+- **Current Setup:** vps05 running with Docker containers
+- **Migration:** Minimal disruption to existing functionality
+- **Scalability:** Plan for future growth beyond initial launch
+
+**Related Issues:** Security assessment (ENH-013) must be completed first
 
 ---
 
