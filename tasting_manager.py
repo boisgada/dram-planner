@@ -9,6 +9,9 @@ import json
 import argparse
 from datetime import datetime
 from collections import defaultdict
+import config
+import os
+import sys
 
 
 def load_json(filepath):
@@ -295,6 +298,135 @@ def find_bottle(collection_file, search_term):
             print(f"Notes: {bottle.get('tasting_notes', 'N/A')}")
 
 
+def show_config(config_file):
+    """Display current configuration."""
+    config_data = config.load_config(config_file)
+    prefs = config_data.get('user_preferences', {})
+    
+    print(f"\n{'='*60}")
+    print(f"Current Configuration")
+    print(f"{'='*60}")
+    print(f"Tasting Frequency: {prefs.get('tasting_frequency', 'weekly')}")
+    if prefs.get('tasting_frequency') == 'custom':
+        print(f"Custom Interval: {prefs.get('custom_interval_days', 7)} days")
+    print(f"Preferred Days: {', '.join(prefs.get('preferred_days', [])) or 'None'}")
+    print(f"Avoid Dates: {len(prefs.get('avoid_dates', []))} date(s) specified")
+    if prefs.get('avoid_dates'):
+        for date in prefs.get('avoid_dates', [])[:5]:
+            print(f"  - {date}")
+        if len(prefs.get('avoid_dates', [])) > 5:
+            print(f"  ... and {len(prefs.get('avoid_dates', [])) - 5} more")
+    print(f"Category Preferences: {len(prefs.get('category_preferences', {}))} category(ies) configured")
+    if prefs.get('category_preferences'):
+        for cat, weight in prefs.get('category_preferences', {}).items():
+            print(f"  - {cat}: {weight}x weight")
+    print(f"Seasonal Adjustments: {'Enabled' if prefs.get('seasonal_adjustments', False) else 'Disabled'}")
+    print(f"Min Days Between Category: {prefs.get('min_days_between_category', 0)}")
+    print(f"Default Schedule Weeks: {prefs.get('default_schedule_weeks', 104)}")
+    print(f"\nConfig file: {config_file}")
+
+
+def set_config_value(config_file, key_path, value):
+    """Set a configuration value.
+    
+    Args:
+        config_file (str): Path to config file.
+        key_path (str): Dot-separated path to config key (e.g., 'user_preferences.tasting_frequency').
+        value: Value to set (will be parsed as appropriate type).
+    """
+    config_data = config.load_config(config_file)
+    
+    # Parse key path
+    keys = key_path.split('.')
+    if len(keys) < 2:
+        print(f"Error: Key path must include section (e.g., 'user_preferences.tasting_frequency')")
+        return False
+    
+    # Navigate to the nested dictionary
+    current = config_data
+    for key in keys[:-1]:
+        if key not in current:
+            print(f"Error: Invalid key path '{key_path}'")
+            return False
+        current = current[key]
+    
+    final_key = keys[-1]
+    
+    # Parse value based on expected type
+    original_value = current.get(final_key)
+    if isinstance(original_value, bool):
+        value = value.lower() in ('true', '1', 'yes', 'on', 'enabled')
+    elif isinstance(original_value, int):
+        try:
+            value = int(value)
+        except ValueError:
+            print(f"Error: '{value}' is not a valid integer")
+            return False
+    elif isinstance(original_value, float):
+        try:
+            value = float(value)
+        except ValueError:
+            print(f"Error: '{value}' is not a valid number")
+            return False
+    elif isinstance(original_value, list):
+        # For lists, support comma-separated values
+        if value.startswith('[') and value.endswith(']'):
+            # JSON array format
+            try:
+                value = json.loads(value)
+            except json.JSONDecodeError:
+                print(f"Error: Invalid JSON array format")
+                return False
+        else:
+            # Comma-separated values
+            value = [v.strip() for v in value.split(',') if v.strip()]
+    elif isinstance(original_value, dict):
+        # For dicts, expect JSON format
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            print(f"Error: Invalid JSON format for dictionary")
+            return False
+    
+    current[final_key] = value
+    
+    if config.save_config(config_data, config_file):
+        print(f"✓ Updated {key_path} = {value}")
+        return True
+    return False
+
+
+def reset_config(config_file):
+    """Reset configuration to defaults."""
+    if os.path.exists(config_file):
+        response = input(f"Reset {config_file} to defaults? This will overwrite current settings. (yes/no): ")
+        if response.lower() not in ('yes', 'y'):
+            print("Cancelled.")
+            return False
+    
+    default_config = config.DEFAULT_CONFIG.copy()
+    if config.save_config(default_config, config_file):
+        print(f"✓ Configuration reset to defaults")
+        return True
+    return False
+
+
+def edit_config(config_file):
+    """Open config file for editing."""
+    if not os.path.exists(config_file):
+        # Create default config first
+        config.load_config(config_file)
+    
+    editor = os.environ.get('EDITOR', 'nano')
+    if sys.platform == 'win32':
+        editor = 'notepad'
+    
+    print(f"Opening {config_file} in {editor}...")
+    print("(Press Ctrl+X to exit nano, or close the editor window)")
+    os.system(f"{editor} {config_file}")
+    print(f"\n✓ Configuration file edited")
+
+
 def main():
     parser = argparse.ArgumentParser(description='Manage your spirits tasting schedule and notes')
     subparsers = parser.add_subparsers(dest='command', help='Commands')
@@ -328,6 +460,24 @@ def main():
     find_parser.add_argument('--collection', default='collection.json')
     find_parser.add_argument('search_term', help='Bottle name or ID')
     
+    # Config management
+    config_parser = subparsers.add_parser('config', help='Manage configuration')
+    config_subparsers = config_parser.add_subparsers(dest='config_command', help='Config commands')
+    
+    config_show_parser = config_subparsers.add_parser('show', help='Show current configuration')
+    config_show_parser.add_argument('--config', default='config.json', help='Path to config file')
+    
+    config_set_parser = config_subparsers.add_parser('set', help='Set a configuration value')
+    config_set_parser.add_argument('--config', default='config.json', help='Path to config file')
+    config_set_parser.add_argument('key', help='Configuration key path (e.g., user_preferences.tasting_frequency)')
+    config_set_parser.add_argument('value', help='Value to set')
+    
+    config_reset_parser = config_subparsers.add_parser('reset', help='Reset configuration to defaults')
+    config_reset_parser.add_argument('--config', default='config.json', help='Path to config file')
+    
+    config_edit_parser = config_subparsers.add_parser('edit', help='Edit configuration file')
+    config_edit_parser.add_argument('--config', default='config.json', help='Path to config file')
+    
     args = parser.parse_args()
     
     if args.command == 'record':
@@ -345,6 +495,17 @@ def main():
         list_bottles(args.collection, args.category, tasted)
     elif args.command == 'find':
         find_bottle(args.collection, args.search_term)
+    elif args.command == 'config':
+        if args.config_command == 'show':
+            show_config(args.config)
+        elif args.config_command == 'set':
+            set_config_value(args.config, args.key, args.value)
+        elif args.config_command == 'reset':
+            reset_config(args.config)
+        elif args.config_command == 'edit':
+            edit_config(args.config)
+        else:
+            config_parser.print_help()
     else:
         parser.print_help()
 
