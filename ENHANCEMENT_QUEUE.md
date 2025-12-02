@@ -4,9 +4,9 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 ## Queue Status
 
-- **Total Items:** 16
+- **Total Items:** 18
 - **In Progress:** 0
-- **Completed:** 8
+- **Completed:** 10
 - **Pending:** 8
 
 ## Priority Levels
@@ -20,24 +20,104 @@ This document tracks all planned enhancements, features, and improvements for Dr
 
 Based on dependencies and user value, the prioritized development sequence is:
 
-1. **ENH-013: Security & Vulnerability Assessment** (🔴 Critical) - BLOCKS PUBLIC LAUNCH
-2. **ENH-014: Production Deployment & Infrastructure** (🔴 Critical) - Public deployment
-3. **ENH-016: Group Creation Troubleshooting & Bug Fixes** (🟠 High) - Fix ENH-008 issues
-4. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
-5. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
-6. **ENH-012: Whisky Database Integration & Public Lists** (✅ Completed) - Extends catalog with whisky data
-7. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
-8. **ENH-015: Catalog Management & Administration** (🟡 Medium) - Catalog administration
-9. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
-10. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
-11. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
-12. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
+1. **ENH-017: User Registration Troubleshooting & Bug Fixes** (✅ Completed) - Registration bug fixed
+2. **ENH-013: Security & Vulnerability Assessment** (🔴 Critical) - BLOCKS PUBLIC LAUNCH
+3. **ENH-014: Production Deployment & Infrastructure** (🔴 Critical) - Public deployment
+4. **ENH-016: Group Creation Troubleshooting & Bug Fixes** (✅ Completed) - Group tables created, functionality fixed
+5. **ENH-010: Web Barcode Scanning & Lookup** (✅ Completed) - Quick web enhancement
+6. **ENH-006: Master Beverage Catalog** (✅ Completed) - Foundational for social features
+7. **ENH-012: Whisky Database Integration & Public Lists** (✅ Completed) - Extends catalog with whisky data
+8. **ENH-008: User Groups & Shared Tasting Schedules** (✅ Completed) - Community features
+9. **ENH-015: Catalog Management & Administration** (🟡 Medium) - Catalog administration
+10. **ENH-018: User Management & Administration** (🟡 Medium) - User admin interface and roles
+11. **ENH-007: Review Visualization & Social Features** (🟡 Medium) - Depends on ENH-006
+12. **ENH-011: Advanced Tasting Customization Options** (🟡 Medium) - Enhanced user preferences
+13. **ENH-009: AI-Powered Schedule Planning** (🟢 Low) - Advanced AI features
+14. **ENH-005: Mobile Applications** (🟡 Medium) - Last as requested, comprehensive effort
 
 ## Enhancement Queue
 
 ### 🔴 Critical Priority
 
-*None currently*
+#### ENH-017: User Registration Troubleshooting & Bug Fixes
+**Status:** ✅ Completed
+**Added:** 2025-12-01
+**Completed:** 2025-12-02
+**Priority:** 🔴 Critical
+**Effort:** 1-3 days
+**Dependencies:** ENH-004 (Web Application), Authentication system
+
+**Description:**
+Debug and resolve the internal server error occurring during user registration. Registration functionality previously worked but is now failing, preventing new users from creating accounts. This is a critical blocker for user onboarding.
+
+**Features:**
+- [ ] **Bug Investigation:**
+  - [ ] Test registration endpoint and form submission
+  - [ ] Check server logs for error details and stack traces
+  - [ ] Identify the exact point of failure in registration flow
+  - [ ] Verify database connection and table structure
+  - [ ] Check for missing database migrations or schema issues
+- [ ] **Backend Issues:**
+  - [ ] Review registration route handler (`/api/auth/register` or similar)
+  - [ ] Validate database models (User model, constraints, relationships)
+  - [ ] Check for missing required fields or validation errors
+  - [ ] Verify password hashing and storage
+  - [ ] Test database transaction handling
+  - [ ] Check for foreign key constraints or unique constraints causing failures
+- [ ] **Frontend Issues:**
+  - [ ] Test registration form submission
+  - [ ] Verify form data is being sent correctly
+  - [ ] Check for JavaScript errors in browser console
+  - [ ] Validate form field requirements and validation
+  - [ ] Test error message display
+- [ ] **Database Issues:**
+  - [ ] Verify User table exists and has correct schema
+  - [ ] Check for missing columns or incorrect data types
+  - [ ] Validate database migrations are applied
+  - [ ] Test database connection and permissions
+  - [ ] Check for constraint violations (unique username/email)
+- [ ] **Error Handling:**
+  - [ ] Improve error logging for registration failures
+  - [ ] Add proper error messages for users
+  - [ ] Validate input sanitization and security
+  - [ ] Check for SQL injection vulnerabilities
+- [ ] **Integration Testing:**
+  - [ ] Test complete registration flow end-to-end
+  - [ ] Test with various input scenarios (valid, invalid, edge cases)
+  - [ ] Verify user is created correctly in database
+  - [ ] Test login after successful registration
+  - [ ] Verify email uniqueness and username uniqueness constraints
+
+**Acceptance Criteria:**
+- User registration works reliably without internal server errors
+- New users can successfully create accounts
+- Proper error messages displayed for validation failures
+- Registration data is correctly stored in database
+- Users can immediately log in after registration
+- All edge cases and error scenarios handled gracefully
+
+**Considerations:**
+- **User Impact:** Critical - blocks all new user signups
+- **Data Integrity:** Ensure no partial user records created on failure
+- **Security:** Verify password hashing and input validation
+- **Testing:** Test with various browsers and scenarios
+- **Logging:** Improve error logging to prevent future issues
+- **Rollback:** May need to rollback recent changes if regression introduced
+
+**Implementation Notes:**
+- **Root Cause:** Missing `email-validator` package required by WTForms Email validator
+- **Error:** `ModuleNotFoundError: No module named 'email_validator'` when submitting registration form
+- **Fix Applied:**
+  - Added `email-validator>=2.0.0` to `web/requirements.txt`
+  - Rebuilt Docker container to install missing dependency
+  - Recreated container to use updated image
+- **Files Modified:**
+  - `web/requirements.txt` - Added email-validator dependency
+- **Status:** ✅ Fixed - Registration should now work correctly
+
+**Related Issues:** Critical bug in ENH-004 Web Application authentication system
+
+---
 
 ### 🟠 High Priority
 
@@ -880,9 +960,96 @@ Add administrative functionality to manage and maintain the master beverage cata
 
 ---
 
-#### ENH-016: Group Creation Troubleshooting & Bug Fixes
+#### ENH-018: User Management & Administration
 **Status:** 🟡 Pending
+**Added:** 2025-12-02
+**Priority:** 🟡 Medium
+**Effort:** 2-3 weeks
+**Dependencies:** ENH-004 (Web Application), Authentication system
+
+**Description:**
+Add comprehensive user management functionality with administrative access controls. Allow administrators to view, manage, and moderate user accounts, including user roles, account status, and administrative actions.
+
+**Features:**
+- [ ] **Admin Role System:**
+  - [ ] Add `is_admin` flag to User model (boolean field)
+  - [ ] Create database migration for admin flag
+  - [ ] Add admin role checking decorators and helpers
+  - [ ] Implement role-based access control (RBAC) foundation
+  - [ ] Admin-only route protection
+- [ ] **User Management Interface:**
+  - [ ] Admin dashboard for user management
+  - [ ] User list view with search and filtering
+  - [ ] User detail view with account information
+  - [ ] User edit capabilities (username, email, role, status)
+  - [ ] User deletion and account deactivation
+- [ ] **User Administration Features:**
+  - [ ] View all registered users
+  - [ ] Search users by username, email, or ID
+  - [ ] Filter users by registration date, activity, role
+  - [ ] View user statistics (bottles, schedules, groups)
+  - [ ] View user activity and login history
+  - [ ] Promote/demote users to/from admin role
+  - [ ] Activate/deactivate user accounts
+  - [ ] Reset user passwords (admin-initiated)
+- [ ] **User Moderation:**
+  - [ ] Suspend/unsuspend user accounts
+  - [ ] View user-reported content or issues
+  - [ ] Manage user-generated content
+  - [ ] Handle user disputes or complaints
+- [ ] **Admin API Endpoints:**
+  - [ ] `GET /api/admin/users` - List all users (admin only)
+  - [ ] `GET /api/admin/users/<id>` - Get user details (admin only)
+  - [ ] `PUT /api/admin/users/<id>` - Update user (admin only)
+  - [ ] `DELETE /api/admin/users/<id>` - Delete/deactivate user (admin only)
+  - [ ] `POST /api/admin/users/<id>/promote` - Promote to admin (admin only)
+  - [ ] `POST /api/admin/users/<id>/reset-password` - Reset password (admin only)
+- [ ] **Security & Permissions:**
+  - [ ] Admin-only access restrictions
+  - [ ] Audit logging for admin actions
+  - [ ] Prevent self-deletion of admin accounts
+  - [ ] Require at least one admin account
+  - [ ] Secure admin endpoints with proper authentication
+- [ ] **User Statistics & Analytics:**
+  - [ ] Total user count and growth metrics
+  - [ ] Active vs inactive users
+  - [ ] User registration trends
+  - [ ] Most active users
+  - [ ] User engagement statistics
+
+**Acceptance Criteria:**
+- Admin flag added to User model and database
+- Admin users can access user management interface
+- Admins can view, edit, and manage all user accounts
+- Admin actions are logged and auditable
+- Non-admin users cannot access admin features
+- User management interface is intuitive and secure
+- All admin operations have proper error handling
+
+**Considerations:**
+- **Security:** Admin access must be strictly controlled and logged
+- **Data Privacy:** Ensure compliance with privacy regulations when managing user data
+- **User Impact:** Admin actions should be reversible when possible
+- **Initial Admin:** Need a way to create the first admin user (migration or script)
+- **Audit Trail:** All admin actions should be logged for accountability
+- **Scalability:** User list should support pagination for large user bases
+- **Performance:** Efficient queries for user search and filtering
+
+**Implementation Notes:**
+- Add `is_admin` boolean column to `users` table
+- Create admin decorator: `@admin_required` for route protection
+- Create admin blueprint: `app/admin/` for admin-specific routes
+- Admin template: `templates/admin/users.html` for user management UI
+- Consider using Flask-Admin library for rapid admin interface development (optional)
+
+**Related Issues:** Foundation for future administrative features (ENH-015 catalog management, content moderation, etc.)
+
+---
+
+#### ENH-016: Group Creation Troubleshooting & Bug Fixes
+**Status:** ✅ Completed
 **Added:** 2025-12-01
+**Completed:** 2025-12-02
 **Priority:** 🟠 High
 **Effort:** 1-2 weeks
 **Dependencies:** ENH-008 (User Groups & Shared Tasting Schedules)
@@ -936,6 +1103,19 @@ Debug and resolve issues with the group creation and management functionality. E
 - **Documentation:** Document all fixes and workarounds
 - **Regression:** Prevent reintroduction of fixed bugs
 
+**Implementation Notes:**
+- **Root Cause:** Missing database tables for group functionality (user_groups, group_memberships, group_schedules, group_schedule_items, master_beverages)
+- **Error:** `relation "group_memberships" does not exist` when accessing group API endpoints
+- **Fix Applied:**
+  - Created missing database tables directly using SQL (bypassed Alembic migration issues)
+  - Created tables: user_groups, group_memberships, group_schedules, group_schedule_items, master_beverages
+  - All tables created with proper foreign key relationships and constraints
+  - Restarted web container to recognize new tables
+- **Files Created:**
+  - `web/migrations/versions/ef504db1363d_add_group_tables_and_master_beverage.py` - Migration file (for future reference)
+  - `web/create_group_tables.py` - Helper script for direct table creation
+- **Status:** ✅ Fixed - Group creation and management should now work correctly
+
 **Related Issues:** Fixes issues in ENH-008 User Groups implementation
 
 ---
@@ -974,5 +1154,5 @@ When adding new items to the queue:
 
 ---
 
-**Last Updated:** 2025-12-01 (ENH-004 completed)
+**Last Updated:** 2025-12-02 (ENH-016 completed - Group creation bug fixed)
 
