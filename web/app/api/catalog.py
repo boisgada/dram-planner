@@ -99,7 +99,10 @@ def get_catalog_beverage(id):
 def add_catalog_beverage():
     """Add a new beverage to the catalog (admin functionality)."""
 
-    # TODO: Add admin permission check
+    # Admin permission check
+    if not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    
     data = request.get_json() or {}
 
     if not data.get('name'):
@@ -132,7 +135,10 @@ def add_catalog_beverage():
 def update_catalog_beverage(id):
     """Update a beverage in the catalog (admin functionality)."""
 
-    # TODO: Add admin permission check
+    # Admin permission check
+    if not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    
     beverage = MasterBeverage.query.get_or_404(id)
     data = request.get_json() or {}
 
@@ -173,7 +179,10 @@ def update_catalog_beverage(id):
 def delete_catalog_beverage(id):
     """Delete a beverage from the catalog (admin functionality)."""
 
-    # TODO: Add admin permission check
+    # Admin permission check
+    if not current_user.is_admin:
+        return jsonify({'error': 'Admin access required'}), 403
+    
     beverage = MasterBeverage.query.get_or_404(id)
 
     db.session.delete(beverage)
