@@ -169,6 +169,16 @@ class UserConfig(db.Model):
     min_days_between_category = db.Column(db.Integer, default=0)
     default_schedule_weeks = db.Column(db.Integer, default=104)
     
+    # Advanced tasting customization (ENH-011)
+    bottles_per_session = db.Column(db.Integer, default=1)
+    rating_scale = db.Column(db.String(20), default='0-10')  # '0-10', '1-5', 'A-F'
+    tasting_note_template = db.Column(db.String(50))  # 'whiskey', 'wine', 'beer', 'custom'
+    blind_tasting_mode = db.Column(db.Boolean, default=False)
+    sort_preference = db.Column(db.String(50))  # 'category', 'abv', 'age', 'region', 'price'
+    exclude_recent_categories_days = db.Column(db.Integer, default=0)
+    notification_enabled = db.Column(db.Boolean, default=False)
+    notification_timing_hours = db.Column(db.Integer, default=24)
+    
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def to_dict(self):
