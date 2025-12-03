@@ -44,6 +44,14 @@ def create_app(config_class=Config):
     from app.admin import bp as admin_bp
     app.register_blueprint(admin_bp)
     
+    # Initialize security extensions
+    from app.security import init_security
+    limiter = init_security(app)
+    
+    # Register rate limit error handler
+    from app.security import rate_limit_exceeded_handler
+    app.register_error_handler(429, rate_limit_exceeded_handler)
+    
     # User loader for Flask-Login
     from app.models import User
     

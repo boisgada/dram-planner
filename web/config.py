@@ -29,6 +29,10 @@ class Config:
     
     # Import/Export
     EXPORT_FOLDER = basedir / 'exports'
+    
+    # Security settings
+    FORCE_HTTPS = os.environ.get('FORCE_HTTPS', 'False').lower() == 'true'
+    RATE_LIMIT_ENABLED = True
 
 
 class DevelopmentConfig(Config):
