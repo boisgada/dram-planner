@@ -27,12 +27,11 @@ def admin_required_api(f):
 def find_duplicates():
     """Find duplicate catalog entries based on name and brand."""
     
-    # Group by name and brand, find duplicates
+    # Group by name and brand, find duplicates (database-agnostic)
     duplicates_query = db.session.query(
         MasterBeverage.name,
         MasterBeverage.brand,
-        func.count(MasterBeverage.id).label('count'),
-        func.array_agg(MasterBeverage.id).label('ids')
+        func.count(MasterBeverage.id).label('count')
     ).group_by(
         MasterBeverage.name,
         MasterBeverage.brand
@@ -41,8 +40,9 @@ def find_duplicates():
     ).all()
     
     duplicates = []
-    for name, brand, count, ids in duplicates_query:
-        entries = MasterBeverage.query.filter(MasterBeverage.id.in_(ids)).all()
+    for name, brand, count in duplicates_query:
+        # Get all entries with this name and brand
+        entries = MasterBeverage.query.filter_by(name=name, brand=brand).all()
         duplicates.append({
             'name': name,
             'brand': brand,
