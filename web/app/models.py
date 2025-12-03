@@ -360,3 +360,43 @@ class GroupScheduleItem(db.Model):
     def __repr__(self):
         return f'<GroupScheduleItem week={self.week} bottle={self.bottle_name}>'
 
+
+class BeverageReview(db.Model):
+    """Community reviews for beverages (ENH-007: Review Visualization & Social Features)."""
+    __tablename__ = 'beverage_reviews'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    beverage_name = db.Column(db.String(255), nullable=False, index=True)
+    beverage_brand = db.Column(db.String(255), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
+    rating = db.Column(db.Float, nullable=False)  # 0-10 scale
+    review_text = db.Column(db.Text)
+    is_public = db.Column(db.Boolean, default=True, index=True)
+    is_anonymous = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('reviews', lazy='dynamic'))
+    
+    __table_args__ = (
+        db.Index('ix_review_beverage_name_brand', 'beverage_name', 'beverage_brand'),
+    )
+    
+    def to_dict(self, include_user=False):
+        """Convert to dictionary for API responses."""
+        return {
+            'id': self.id,
+            'beverage_name': self.beverage_name,
+            'beverage_brand': self.beverage_brand,
+            'rating': self.rating,
+            'review_text': self.review_text,
+            'is_public': self.is_public,
+            'is_anonymous': self.is_anonymous,
+            'username': None if self.is_anonymous else (self.user.username if include_user else None),
+            'created_at': self.created_at.isoformat(),
+            'updated_at': self.updated_at.isoformat()
+        }
+    
+    def __repr__(self):
+        return f'<BeverageReview {self.beverage_name} - {self.rating}/10>'
