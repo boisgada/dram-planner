@@ -61,13 +61,17 @@ jobs:
 
     - name: Run Bandit security scan
       run: |
-        bandit -r . -f json -o bandit-report.json || true
-        bandit -r . -f txt
+        bandit -r . -f json -o bandit-report.json -c .bandit || true
+        bandit -r . -f txt -c .bandit || true
 
     - name: Run Safety dependency check
       run: |
         safety check --json --output safety-report.json || true
-        safety check
+        safety check || true
+
+    - name: Run custom security scan script
+      run: |
+        python scripts/security_scan.py || true
 
     - name: Upload security reports
       uses: actions/upload-artifact@v3

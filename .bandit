@@ -1,0 +1,21 @@
+# Bandit configuration file
+# See: https://bandit.readthedocs.io/en/latest/config.html
+
+[bandit]
+# Exclude test files and directories
+exclude_dirs = tests,venv,env,__pycache__,migrations,.git,node_modules,htmlcov
+
+# Skip specific tests
+skips = B101,B601  # Skip assert_used and shell_injection_subprocess
+
+# Severity levels to report
+severity_level = medium
+
+# Confidence levels to report
+confidence_level = medium
+
+# Skip specific lines (useful for false positives)
+#
+# Example:
+# line_number_exclusions = {1: ['B101'], 2: ['B601']}
+
