@@ -6,5 +6,5 @@ from flask import Blueprint
 
 bp = Blueprint('api', __name__)
 
-from app.api import bottles, schedules, config, auth, export, barcode, catalog, groups, whisky_sources, admin, health
+from app.api import bottles, schedules, config, auth, export, barcode, catalog, catalog_admin, groups, whisky_sources, admin, health
 
