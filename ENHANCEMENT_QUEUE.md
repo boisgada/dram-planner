@@ -416,7 +416,7 @@ Provide users with a master list/catalog of beverages to select from when adding
 ---
 
 #### ENH-007: Review Visualization & Social Features
-**Status:** 🟡 Pending
+**Status:** 🔵 In Progress
 **Added:** 2025-12-01
 **Priority:** 🟡 Medium
 **Effort:** 3-4 weeks
@@ -634,7 +634,7 @@ Add barcode scanning and automatic product lookup functionality to the web GUI, 
 ---
 
 #### ENH-011: Advanced Tasting Customization Options
-**Status:** 🟡 Pending
+**Status:** 🔵 In Progress
 **Added:** 2025-12-01
 **Priority:** 🟡 Medium
 **Effort:** 2-3 weeks
@@ -700,7 +700,7 @@ Add granular customization options for tasting sessions to support diverse tasti
 ---
 
 #### ENH-013: Security & Vulnerability Assessment
-**Status:** 🟡 Pending
+**Status:** ✅ Completed
 **Added:** 2025-12-01
 **Priority:** 🔴 Critical
 **Effort:** 1-2 weeks
@@ -760,7 +760,7 @@ Perform comprehensive security assessment and vulnerability scanning of the Dram
 ---
 
 #### ENH-014: Production Deployment & Infrastructure
-**Status:** 🟡 Pending
+**Status:** 🔵 In Progress
 **Added:** 2025-12-01
 **Priority:** 🔴 Critical
 **Effort:** 2-3 weeks
@@ -902,7 +902,7 @@ Integrate with publicly available whisky databases and lists, providing search a
 ---
 
 #### ENH-015: Catalog Management & Administration
-**Status:** 🟡 Pending
+**Status:** 🔵 In Progress
 **Added:** 2025-12-01
 **Priority:** 🟡 Medium
 **Effort:** 2-3 weeks
